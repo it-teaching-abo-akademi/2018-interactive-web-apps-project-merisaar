@@ -2,54 +2,90 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 // import App from './App';
 import * as serviceWorker from './serviceWorker';
-import logo from './logo.svg';
+// import logo from './logo.svg';
 import './App.css';
-import {Portfolio} from './components/portfolio.js'
+import Portfolio from './components/portfolio.js'
+// import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
-const App = () => {
-  const portfolio = {
-      nimi: 'Half Stack -sovelluskehitys',
-      osat: [
+class App extends React.Component {
+  state = {
+     portfolio: [
         {
-          nimi: 'Reactin perusteet',
-          url: "google.com"
+          name: 'Portfolio 1',
+          url: "google.com",
+          stocks: [
+            {
+              name: 'Reactin perusteet',
+              uv: 4.3,
+              quantity:10,
+              tv: 0,
+            },
+            {
+              name: 'Tiedonvälitys propseilla',
+              uv: 2.64,
+              quantity:4,
+              tv: 0,
+            },
+            {
+              name: 'Komponenttien tila',
+              uv: 40.32,
+              quantity:1,
+              tv: 0,
+            }
+          ]
         },
         {
-          nimi: 'Tiedonvälitys propseilla',
-          url: "google.com/test"
-        },
-        {
-          nimi: 'Komponenttien tila',
-          url: "google.com"
+          name: 'Portfolio 2',
+          url: "google.com",
+          stocks: [
+            {
+              name: 'Reactin perusteet',
+              uv: 4.3,
+              quantity:10,
+              tv: 0,
+            },
+            {
+              name: 'Tiedonvälitys propseilla',
+              uv: 2.64,
+              quantity:4,
+              tv: 0,
+            },
+            {
+              name: 'Komponenttien tila',
+              uv: 40.32,
+              quantity:1,
+              tv: 0,
+            }
+          ]
         }
       ]
     }
-    const renObjData = portfolio.osat.map(function(data, idx) {
-       return (
-           <Portfolio url={data.url} key={idx} />
+    render(){
+    const renObjData = this.state.portfolio.map(function(data, idx) {
+      console.log(data) 
+      return (
+         
+           <Portfolio name={data.name} stocks={data.stocks} key={idx} />
 
        );
      });
     return (
-      <div className="App">
-        <header className="App-header">
+      // <MuiThemeProvider>
 
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
+      <div className="App">
+        <header >
         </header>
         <body>
-        <div class="row">
+        <div className="addPortfolio"> <button>Add portfolio</button></div>
+        <div className="row">
           {renObjData}
+
           </div>
         </body>
       </div>
+      // </MuiThemeProvider>
   )
+    }
 }
 
 
