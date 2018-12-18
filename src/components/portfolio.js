@@ -7,25 +7,41 @@ export default class Portfolio extends React.Component{
     super(props);
     this.state = {
       stocks: this.props.stocks,
-      currencyRate: 1.12,
+      currency: 'EUR',
     };
+    this.fetchCurrencyRate = this.fetchCurrencyRate.bind(this)
+    console.log(this.state.stocks)
   }
+  //Calculates the total
   calculate (value) {
     console.log(this.state.currencyRate*value)
     return this.state.currencyRate*value
   }
-  render() {
-    const fetchCurrencyRate = (cur) => {
-      fetch('https://free.currencyconverterapi.com/api/v6/convert?q=EUR_' + cur)
-        .then(response => response.json())
-        .then(data => {
-          console.log( data.results['EUR_'+cur])
-          var cr = data.results['EUR_'+cur]
-          this.setState({
-            currencyRate : cr
+  //Fetches currency rate from API on click
+  fetchCurrencyRate(e, cur1, cur2) {
+    e.stopPropagation();
+    fetch('https://free.currencyconverterapi.com/api/v6/convert?q=' + cur1 + '_' + cur2)
+      .then(response => response.json())
+      .then(data => {
+        if(cur2 != this.state.currency){          
+          var cr = data.results[cur1 + '_'+ cur2].val
+          const stocksC =this.state.stocks.map(data => data = data);
+          stocksC.forEach(function(st){
+            st.uv = (st.uv*cr).toFixed(2)
           })
-        })
-    }
+          this.setState({
+            stocks: stocksC,
+            currency: cur2,
+          });
+      }
+      })
+  }
+  //Adds new empty stock
+  addNewPortfolio (e) {
+    e.stopPropagation();
+  }
+  render() {
+
 
     const renObjData = this.state.stocks.map(function(data, idx) {
       return (
@@ -37,10 +53,10 @@ export default class Portfolio extends React.Component{
       <div className="card item2">
       {this.props.name}
        <div className="btngroup">
-            <button onClick={fetchCurrencyRate} className="button" id="desktop" >
+            <button onClick={(e) => {this.fetchCurrencyRate(e, 'USD', 'EUR')}} className="button" id="desktop" >
             Show in €
           </button>
-            <button  className="button" id="mobile" >
+            <button onClick={(e) => {this.fetchCurrencyRate(e, 'EUR', 'USD')}} className="button" id="mobile" >
             show in $
           </button>
 

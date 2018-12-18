@@ -62,24 +62,24 @@ class App extends React.Component {
       }
       this.addNewPortfolio = this.addNewPortfolio.bind(this);
     }
-    
-  addNewPortfolio (e) {
-    e.stopPropagation();
-    let len = this.state.portfolio.length +1
-    let newPortfolio = { name: 'Portfolio ' + len, stocks: []}
-    this.setState({
-      portfolio: this.state.portfolio.concat([newPortfolio])
-    });
+    //Adds new empty portfolio
+    addNewPortfolio (e) {
+      e.stopPropagation();
+      let len = this.state.portfolio.length +1
+      let newPortfolio = { name: 'Portfolio ' + len, stocks: []}
+      this.setState({
+        portfolio: this.state.portfolio.concat([newPortfolio])
+      });
     }
-    render(){
-    const renObjData = this.state.portfolio.map(function(data, idx) {
-      console.log(data) 
-      return (
-         
-           <Portfolio name={data.name} stocks={data.stocks} key={idx} />
 
-       );
-     });
+    render(){
+      //Adds portfolios from state to the page
+      const renObjData = this.state.portfolio.map(function(data, idx) {
+        console.log(data) 
+        return (
+            <Portfolio name={data.name} stocks={data.stocks} key={idx} />
+        );
+      });
     return (
       // <MuiThemeProvider>
 
