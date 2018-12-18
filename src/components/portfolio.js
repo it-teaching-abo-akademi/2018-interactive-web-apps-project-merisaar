@@ -5,15 +5,22 @@ import '../App.css';
 export default class Portfolio extends React.Component{
   constructor(props) {
     super(props);
-    const copyTest = this.props.stocks.map(data => data).forEach(function(st){ 
+    let copyTest = [...props.stocks]
+    copyTest = copyTest.forEach(function(st){ 
       st.tv = st.uv*st.quantity
     })
     console.log(copyTest)
     this.state = {
       stocks: this.props.stocks,
       currency: 'EUR',
+      newName: '',
+      name: this.props.name,
+      key: this.props.key,
     };
     this.fetchCurrencyRate = this.fetchCurrencyRate.bind(this)
+    this.changeName =this.changeName.bind(this)
+    this.save =this.save.bind(this)
+
   }
 
   //Fetches currency rate from API on click
@@ -22,9 +29,9 @@ export default class Portfolio extends React.Component{
     fetch('https://free.currencyconverterapi.com/api/v6/convert?q=' + cur1 + '_' + cur2)
       .then(response => response.json())
       .then(data => {
-        if(cur2 != this.state.currency){          
+        if(cur2 !== this.state.currency){          
           var cr = data.results[cur1 + '_'+ cur2].val
-          const stocksC =this.state.stocks.map(data => data = data);
+          const stocksC =this.state.stocks.map(data => data);
           stocksC.forEach(function(st){
             st.uv = (st.uv*cr).toFixed(2)
             st.tv = (st.uv*st.quantity).toFixed(2)
@@ -37,9 +44,44 @@ export default class Portfolio extends React.Component{
       })
   }
   //Adds new empty stock
-  addNewPortfolio (e) {
+  addNewStock (e) {
     e.stopPropagation();
   }
+  //Toggles input and text
+  hideTextShowInput(e){
+    e.stopPropagation();
+    let el = e.target
+    let input = el.parentElement.firstChild
+    // let saveButton = el.parentElement.childNodes[1]
+    console.log(el.parentElement)
+    if(el.hasAttribute("hidden")){
+       el.removeAttribute("hidden")
+
+     }else{ 
+       el.setAttribute("hidden", true)}
+       input.removeAttribute("hidden")
+  }
+  //Store name while typing
+  changeName(e){
+    e.stopPropagation();
+    console.log(e.target.value)
+    this.setState({
+      newName:e.target.value,
+    })
+  }
+  //Change name by clicking save button
+  save(e){
+    e.stopPropagation();
+    this.setState({
+      name: this.state.newName})
+    let div = e.target.parentElement
+    let text = div.nextSibling
+    console.log(text)
+    div.setAttribute("hidden", true)
+    text.removeAttribute("hidden")
+  }
+  
+
   render() {
 
     const renObjData = this.state.stocks.map(function(data, idx) {
@@ -50,7 +92,7 @@ export default class Portfolio extends React.Component{
 
     return (
       <div className="card item2">
-      {this.props.name}
+      <div  ><div hidden><input onChange={this.changeName} id={this.props.name}></input><button onClick={this.save}>Save</button></div><p onClick={this.hideTextShowInput}>{this.state.name}</p></div>
        <div className="btngroup">
             <button onClick={(e) => {this.fetchCurrencyRate(e, 'USD', 'EUR')}} className="button" id="desktop" >
             Show in €

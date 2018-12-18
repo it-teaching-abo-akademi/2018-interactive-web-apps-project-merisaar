@@ -84,6 +84,10 @@
   .container {
     padding: 2px 16px;
   }
+  .invisible{
+    visibility: hidden;
+  }
+  
   table.blueTable {
     border: 1px solid #000000;
     background-color: #EEBEAC;
@@ -98,6 +102,7 @@
   table.blueTable tbody tr:hover {
     background-color: rgba(247, 125, 88, 0.247);
   }
+  
   table.blueTable tbody td {
     font-size: 13px;
   }
