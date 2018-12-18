@@ -8,57 +8,68 @@ import Portfolio from './components/portfolio.js'
 // import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 class App extends React.Component {
-  state = {
-     portfolio: [
-        {
-          name: 'Portfolio 1',
-          url: "google.com",
-          stocks: [
-            {
-              name: 'Reactin perusteet',
-              uv: 4.3,
-              quantity:10,
-              tv: 0,
-            },
-            {
-              name: 'Tiedonvälitys propseilla',
-              uv: 2.64,
-              quantity:4,
-              tv: 0,
-            },
-            {
-              name: 'Komponenttien tila',
-              uv: 40.32,
-              quantity:1,
-              tv: 0,
-            }
-          ]
-        },
-        {
-          name: 'Portfolio 2',
-          url: "google.com",
-          stocks: [
-            {
-              name: 'Reactin perusteet',
-              uv: 4.3,
-              quantity:10,
-              tv: 0,
-            },
-            {
-              name: 'Tiedonvälitys propseilla',
-              uv: 2.64,
-              quantity:4,
-              tv: 0,
-            },
-            {
-              name: 'Komponenttien tila',
-              uv: 40.32,
-              quantity:1,
-              tv: 0,
-            }
-          ]
-        }
-      ]
+  constructor() {
+    super();
+    this.state = {
+      portfolio: [
+          {
+            name: 'Portfolio 1',
+            stocks: [
+              {
+                name: 'Reactin perusteet',
+                uv: 4.3,
+                quantity:10,
+                tv: 0,
+              },
+              {
+                name: 'Tiedonvälitys propseilla',
+                uv: 2.64,
+                quantity:4,
+                tv: 0,
+              },
+              {
+                name: 'Komponenttien tila',
+                uv: 40.32,
+                quantity:1,
+                tv: 0,
+              }
+            ]
+          },
+          {
+            name: 'Portfolio 2',
+            stocks: [
+              {
+                name: 'Reactin perusteet',
+                uv: 4.3,
+                quantity:10,
+                tv: 0,
+              },
+              {
+                name: 'Tiedonvälitys propseilla',
+                uv: 2.64,
+                quantity:4,
+                tv: 0,
+              },
+              {
+                name: 'Komponenttien tila',
+                uv: 40.32,
+                quantity:1,
+                tv: 0,
+              }
+            ]
+          }
+        ]
+      }
+      this.addNewPortfolio = this.addNewPortfolio.bind(this);
+    }
+    
+  addNewPortfolio (e) {
+    e.stopPropagation();
+    let len = this.state.portfolio.length +1
+    let newPortfolio = { name: 'Portfolio ' + len, stocks: []}
+    this.setState({
+      portfolio: this.state.portfolio.concat([newPortfolio])
+    });
     }
     render(){
     const renObjData = this.state.portfolio.map(function(data, idx) {
@@ -74,9 +85,10 @@ class App extends React.Component {
 
       <div className="App">
         <header >
+
         </header>
         <body>
-        <div className="addPortfolio"> <button>Add portfolio</button></div>
+        <div className="addPortfolio"> <button onClick={this.addNewPortfolio}>Add portfolio</button></div>
         <div className="row">
           {renObjData}
 

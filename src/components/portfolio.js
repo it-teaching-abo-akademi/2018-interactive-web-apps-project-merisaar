@@ -5,27 +5,31 @@ import '../App.css';
 export default class Portfolio extends React.Component{
   constructor(props) {
     super(props);
-    this.state = {date: new Date()};
+    this.state = {
+      stocks: this.props.stocks,
+      currencyRate: 1.12,
+    };
   }
-fetchCurrencyRate (cur1, cur2) {
-    fetch('https://free.currencyconverterapi.com/api/v6/convert?q='+ cur1 +'_' + cur2)
-      .then(response => response.json())
-      .then(data => {
-      })
-  }
-
-fetchCurrencyRae (cur1, cur2) {
-    fetch('https://free.currencyconverterapi.com/api/v6/convert?q='+ cur1 +'_' + cur2)
-      .then(response => response.json())
-      .then(data => {
-        console.log(data.results)
-      })
+  calculate (value) {
+    console.log(this.state.currencyRate*value)
+    return this.state.currencyRate*value
   }
   render() {
-    
-    const renObjData = this.props.stocks.map(function(data, idx) {
+    const fetchCurrencyRate = (cur) => {
+      fetch('https://free.currencyconverterapi.com/api/v6/convert?q=EUR_' + cur)
+        .then(response => response.json())
+        .then(data => {
+          console.log( data.results['EUR_'+cur])
+          var cr = data.results['EUR_'+cur]
+          this.setState({
+            currencyRate : cr
+          })
+        })
+    }
+
+    const renObjData = this.state.stocks.map(function(data, idx) {
       return (
-          <Stock name={data.name} key={idx} />
+          <Stock stock ={data} key={idx} />
         );
       });
 
@@ -33,7 +37,7 @@ fetchCurrencyRae (cur1, cur2) {
       <div className="card item2">
       {this.props.name}
        <div className="btngroup">
-            <button className="button" id="desktop" >
+            <button onClick={fetchCurrencyRate} className="button" id="desktop" >
             Show in €
           </button>
             <button  className="button" id="mobile" >
@@ -44,7 +48,7 @@ fetchCurrencyRae (cur1, cur2) {
     <div className="table-wrapper">
         <table className="blueTable">
         <tbody>
-          <tr><th>Name</th><th>Name</th><th>Name</th></tr>
+          <tr><th>Name</th><th>Value</th><th>Quantity</th><th>Total</th></tr>
           {renObjData}
           </tbody>
 

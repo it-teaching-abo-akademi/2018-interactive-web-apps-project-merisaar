@@ -95,6 +95,9 @@
     border: 1px solid #AAAAAA;
     padding: 3px 2px;
   }
+  table.blueTable tbody tr:hover {
+    background-color: rgba(247, 125, 88, 0.247);
+  }
   table.blueTable tbody td {
     font-size: 13px;
   }
@@ -190,6 +193,7 @@
     padding: 3%;
     display: flex;
   }
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
