@@ -5,18 +5,17 @@ import '../App.css';
 export default class Portfolio extends React.Component{
   constructor(props) {
     super(props);
+    const copyTest = this.props.stocks.map(data => data).forEach(function(st){ 
+      st.tv = st.uv*st.quantity
+    })
+    console.log(copyTest)
     this.state = {
       stocks: this.props.stocks,
       currency: 'EUR',
     };
     this.fetchCurrencyRate = this.fetchCurrencyRate.bind(this)
-    console.log(this.state.stocks)
   }
-  //Calculates the total
-  calculate (value) {
-    console.log(this.state.currencyRate*value)
-    return this.state.currencyRate*value
-  }
+
   //Fetches currency rate from API on click
   fetchCurrencyRate(e, cur1, cur2) {
     e.stopPropagation();
@@ -28,6 +27,7 @@ export default class Portfolio extends React.Component{
           const stocksC =this.state.stocks.map(data => data = data);
           stocksC.forEach(function(st){
             st.uv = (st.uv*cr).toFixed(2)
+            st.tv = (st.uv*st.quantity).toFixed(2)
           })
           this.setState({
             stocks: stocksC,
@@ -41,7 +41,6 @@ export default class Portfolio extends React.Component{
     e.stopPropagation();
   }
   render() {
-
 
     const renObjData = this.state.stocks.map(function(data, idx) {
       return (
