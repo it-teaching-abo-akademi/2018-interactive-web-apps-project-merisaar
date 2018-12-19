@@ -2,6 +2,7 @@ import React from 'react'
 import Stock from './stockData.js'
 import '../App.css';
 import Modal from './Modal';
+import Chart from "react-google-charts";
 
 export default class Portfolio extends React.Component{
   constructor(props) {
@@ -18,6 +19,8 @@ export default class Portfolio extends React.Component{
       id: this.props.id,
       isOpen: false,
       newStock: {name : '', uv : 0, quantity : 0, tv:0},
+      chartData: [],
+      stockData: [],
     };
     this.fetchCurrencyRate = this.fetchCurrencyRate.bind(this)
     this.changeName =this.changeName.bind(this)
@@ -26,6 +29,7 @@ export default class Portfolio extends React.Component{
     this.newStock = this.newStock.bind(this)
     this.removeSelected = this.removeSelected.bind(this)
     this.setChecked = this.setChecked.bind(this)
+    this.drawCurveTypes = this.drawCurveTypes.bind(this)
   }
 
   //Fetches currency rate from API on click
@@ -146,14 +150,63 @@ export default class Portfolio extends React.Component{
     this.setState({stocks: stocksCpy});
 
   }
+  async fetchStockData(name){
+    // await fetch('https://www.alphavantage.co/query?function='+name+'&symbol=USDEUR&interval=weekly&time_period=10&series_type=open&apikey=XDNRE3YNSC6MJXBQ')
+    await fetch('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MSFT&apikey=demo')    
+    .then(response => response.json())
+    .then(data => {
+      // console.log(data)
+      // console.log(data['Technical Analysis: ' + name])
+      // let dataL = data['Technical Analysis: ' + name]
+      // let days = Object.keys(dataL)
+      // days = days.slice(-10)
+      // console.log(days)
+      // let test = []
+      // test = days.map(day => test.concat(dataL[day])[0])
+      // let sD = Object.assign([], this.state.stockData)
+      // sD = sD.concat(test)
+      // console.log(sD)
+      // this.setState({stockData: sD})
+      // return sD
+      console.log(data)
+      return data
+    })
+  }
+  async drawCurveTypes() {
+    let stocks = this.state.stocks
+    // console.log(stocks)
+    let data = Object.assign([], this.state.chartData)
+    let list = ['Time']
+    let nameList = stocks.map(l => l.name)
+    list = list.concat(nameList)
+    data = data.concat(list)
+    await Promise.all(nameList.map(async (name) => 
+      this.fetchStockData(name))).then(function(result) {
+        console.log(result.type)
+      })
+    // console.log(dataList)
+  }
 
   render() {
+    const data = [
+      ["Year", "Sales", "Expenses"],
+      ["2004", 1000, 400],
+      ["2005", 1170, 460],
+      ["2006", 660, 1120],
+      ["2007", 1030, 540]
+    ];
+    const options = {
+      title: "Stock value",
+      curveType: "function",
+      legend: { position: "bottom" }
+    };
     const renObjData = this.state.stocks.map((data, index) =>
           <Stock stock ={data} key={index} setChecked={this.setChecked}/>
     );
 
     return (
       <div className="card">
+      <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
       <button onClick ={this.closePortfolio} className = 'close' ></button>
       <div><div hidden><input onChange={this.changeName} id={this.props.name}></input><button onClick={this.save}>Save</button></div><p onClick={this.hideTextShowInput}>{this.state.name}</p></div>
        <div className="btngroup">
@@ -165,6 +218,13 @@ export default class Portfolio extends React.Component{
           </button>
 
     </div>
+    <Chart
+          chartType="LineChart"
+          width="100%"
+          height="400px"
+          data={data}
+          options={options}
+        />
     <div className="table-wrapper">
         <table className="blueTable">
         <tbody>
@@ -180,7 +240,7 @@ export default class Portfolio extends React.Component{
 Add in stock
 </button>
 
-<button className="button" id="mobile" >
+<button onClick={this.drawCurveTypes} className="button" id="mobile" >
 Perf graph
 </button>
 <button onClick={this.removeSelected} className="button" id="mobile" >
@@ -197,7 +257,13 @@ Remove selected
           <button onClick={this.saveStock}type="button">Save</button>
           </form>
         </Modal>
+<Modal show={this.state.modalIsOpen}
+          onClose={this.toggleModal}>
+          <div id="chart_div"></div>
+        </Modal>
         </div>
+     
+      
     )
   }
 }

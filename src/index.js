@@ -18,7 +18,7 @@ class App extends React.Component {
             stocks: [
               {
                 id: 'stock11',
-                name: 'Reactin perusteet',
+                name: 'ADX',
                 uv: 4.3,
                 quantity:10,
                 tv: 0,
@@ -26,7 +26,7 @@ class App extends React.Component {
               },
               {
                 id: 'stock12',
-                name: 'Tiedonvälitys propseilla',
+                name: 'SMA',
                 uv: 2.64,
                 quantity:4,
                 tv: 0,
@@ -34,7 +34,7 @@ class App extends React.Component {
               },
               {
                 id: 'stock13',
-                name: 'Komponenttien tila',
+                name: 'EMA',
                 uv: 40.32,
                 quantity:1,
                 tv: 0,
@@ -48,7 +48,7 @@ class App extends React.Component {
             stocks: [
               {
                 id: 'stock21',
-                name: 'Reactin perusteet',
+                name: 'DEMA',
                 uv: 4.3,
                 quantity:10,
                 tv: 0,
@@ -56,7 +56,7 @@ class App extends React.Component {
               },
               {
                 id: 'stock22',
-                name: 'Tiedonvälitys propseilla',
+                name: 'MOM',
                 uv: 2.64,
                 quantity:4,
                 tv: 0,
@@ -64,7 +64,7 @@ class App extends React.Component {
               },
               {
                 id: 'stock23',
-                name: 'Komponenttien tila',
+                name: 'PPO',
                 uv: 40.32,
                 quantity:1,
                 tv: 0,
@@ -107,6 +107,7 @@ class App extends React.Component {
 
           </div>
         </body>
+        
       </div>
 
   )
