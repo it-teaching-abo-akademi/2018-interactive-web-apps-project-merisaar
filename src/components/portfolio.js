@@ -1,5 +1,5 @@
 import React from 'react'
-import {Stock} from './stockData.js'
+import Stock from './stockData.js'
 import '../App.css';
 import Modal from './Modal';
 
@@ -17,13 +17,14 @@ export default class Portfolio extends React.Component{
       name: this.props.name,
       id: this.props.id,
       isOpen: false,
-      newStock: {name : '', uv : 0, quantity : 0, tv:0}
+      newStock: {name : '', uv : 0, quantity : 0, tv:0},
     };
     this.fetchCurrencyRate = this.fetchCurrencyRate.bind(this)
     this.changeName =this.changeName.bind(this)
     this.save =this.save.bind(this)
     this.saveStock = this.saveStock.bind(this)
     this.newStock = this.newStock.bind(this)
+    this.removeSelected = this.removeSelected.bind(this)
 
   }
 
@@ -126,10 +127,14 @@ export default class Portfolio extends React.Component{
       alert('Invalid input')
     }
   }
+    //Removes selected columns and stocks
+    removeSelected (e) {
+
+    }
 
   render() {
     const renObjData = this.state.stocks.map((data, index) =>
-          <Stock stock ={data} key={index} />
+          <Stock stock ={data} key={index} id={index} />
         );
 
     return (
@@ -163,7 +168,7 @@ Add in stock
 <button className="button" id="mobile" >
 Perf graph
 </button>
-<button className="button" id="mobile" >
+<button onClick={this.removeSelected} className="button" id="mobile" >
 Remove selected
 </button>
 

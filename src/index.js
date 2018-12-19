@@ -21,18 +21,21 @@ class App extends React.Component {
                 uv: 4.3,
                 quantity:10,
                 tv: 0,
+                checked: false,
               },
               {
                 name: 'Tiedonvälitys propseilla',
                 uv: 2.64,
                 quantity:4,
                 tv: 0,
+                checked: false,
               },
               {
                 name: 'Komponenttien tila',
                 uv: 40.32,
                 quantity:1,
                 tv: 0,
+                checked: false,
               }
             ]
           },
@@ -45,18 +48,21 @@ class App extends React.Component {
                 uv: 4.3,
                 quantity:10,
                 tv: 0,
+                checked: false,
               },
               {
                 name: 'Tiedonvälitys propseilla',
                 uv: 2.64,
                 quantity:4,
                 tv: 0,
+                checked: false,
               },
               {
                 name: 'Komponenttien tila',
                 uv: 40.32,
                 quantity:1,
                 tv: 0,
+                checked: false,
               }
             ]
           }
