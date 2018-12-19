@@ -25,7 +25,7 @@ export default class Portfolio extends React.Component{
     this.saveStock = this.saveStock.bind(this)
     this.newStock = this.newStock.bind(this)
     this.removeSelected = this.removeSelected.bind(this)
-
+    this.setChecked = this.setChecked.bind(this)
   }
 
   //Fetches currency rate from API on click
@@ -36,7 +36,7 @@ export default class Portfolio extends React.Component{
       .then(data => {
         if(cur2 !== this.state.currency){          
           var cr = data.results[cur1 + '_'+ cur2].val
-          const stocksC =this.state.stocks.map(data => data);
+          const stocksC =[...this.state.stocks]
           stocksC.forEach(function(st){
             st.uv = (st.uv*cr).toFixed(2)
             st.tv = (st.uv*st.quantity).toFixed(2)
@@ -61,10 +61,9 @@ export default class Portfolio extends React.Component{
     console.log(el.parentElement)
     if(el.hasAttribute("hidden")){
        el.removeAttribute("hidden")
-
-     }else{ 
-       el.setAttribute("hidden", true)}
-       input.removeAttribute("hidden")
+    }else{ 
+      el.setAttribute("hidden", true)}
+      input.removeAttribute("hidden")
   }
   //Store name while typing
   changeName(e){
@@ -118,6 +117,9 @@ export default class Portfolio extends React.Component{
     if(this.state.newStock.name.length>1 && this.state.newStock.uv > 0 && this.state.newStock.quantity > 0){
       let newstock =  {...this.state.newStock}
       newstock.tv = newstock.uv*newstock.quantity
+      let len = this.state.stocks.length + 1
+      newstock.id = 'stock' + this.state.id + len 
+      console.log(newstock.id)
       var newStocksList = this.state.stocks.concat(newstock)
       this.setState({
         stocks: newStocksList,
@@ -127,15 +129,28 @@ export default class Portfolio extends React.Component{
       alert('Invalid input')
     }
   }
-    //Removes selected columns and stocks
-    removeSelected (e) {
+  //Removes selected columns and stocks
+  removeSelected (e) {
+    let stocksCopy = [...this.state.stocks]
+    console.log(stocksCopy)
+    let selected = stocksCopy.filter(stock => stock.checked === false)
+    console.log(selected)
+    this.setState({stocks: selected});
+  }
+  //Sets checked to true in state stock when clicking the checkbox
+  setChecked (e, id) {
+    e.stopPropagation()
+    let stocksCpy = Object.assign([], this.state.stocks);
+    let stock = stocksCpy.filter(s=> s.id === id)[0]
+    stock.checked ? stock.checked = false : stock.checked = true
+    this.setState({stocks: stocksCpy});
 
-    }
+  }
 
   render() {
     const renObjData = this.state.stocks.map((data, index) =>
-          <Stock stock ={data} key={index} id={index} />
-        );
+          <Stock stock ={data} key={index} setChecked={this.setChecked}/>
+    );
 
     return (
       <div className="card">

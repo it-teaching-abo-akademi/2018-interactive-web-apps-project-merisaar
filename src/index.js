@@ -17,6 +17,7 @@ class App extends React.Component {
             id: 1,
             stocks: [
               {
+                id: 'stock11',
                 name: 'Reactin perusteet',
                 uv: 4.3,
                 quantity:10,
@@ -24,6 +25,7 @@ class App extends React.Component {
                 checked: false,
               },
               {
+                id: 'stock12',
                 name: 'Tiedonvälitys propseilla',
                 uv: 2.64,
                 quantity:4,
@@ -31,6 +33,7 @@ class App extends React.Component {
                 checked: false,
               },
               {
+                id: 'stock13',
                 name: 'Komponenttien tila',
                 uv: 40.32,
                 quantity:1,
@@ -44,6 +47,7 @@ class App extends React.Component {
             id: 2,
             stocks: [
               {
+                id: 'stock21',
                 name: 'Reactin perusteet',
                 uv: 4.3,
                 quantity:10,
@@ -51,6 +55,7 @@ class App extends React.Component {
                 checked: false,
               },
               {
+                id: 'stock22',
                 name: 'Tiedonvälitys propseilla',
                 uv: 2.64,
                 quantity:4,
@@ -58,6 +63,7 @@ class App extends React.Component {
                 checked: false,
               },
               {
+                id: 'stock23',
                 name: 'Komponenttien tila',
                 uv: 40.32,
                 quantity:1,
@@ -87,7 +93,7 @@ class App extends React.Component {
     render(){
       //Adds portfolios from state to the page
       const renObjData = this.state.portfolio.map( data =>
-            <Portfolio name={data.name} stocks={data.stocks} key = {data.id} id={data.key} />
+            <Portfolio name={data.name} stocks={data.stocks} key = {data.id} id={data.id} />
         );
     return (
       <div className="App">
