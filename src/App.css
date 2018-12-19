@@ -99,12 +99,16 @@
     border: 1px solid #AAAAAA;
     padding: 3px 2px;
   }
+
   table.blueTable tbody tr:hover {
     background-color: rgba(247, 125, 88, 0.247);
   }
   
   table.blueTable tbody td {
     font-size: 13px;
+  }
+  table.blueTable tbody td input {
+    margin-left:30%;
   }
   table.blueTable tr:nth-child(even) {
     background: #FFFFFF;
