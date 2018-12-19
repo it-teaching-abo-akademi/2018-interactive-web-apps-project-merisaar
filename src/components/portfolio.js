@@ -1,6 +1,7 @@
 import React from 'react'
 import {Stock} from './stockData.js'
 import '../App.css';
+import Modal from './Modal';
 
 export default class Portfolio extends React.Component{
   constructor(props) {
@@ -15,11 +16,14 @@ export default class Portfolio extends React.Component{
       newName: '',
       name: this.props.name,
       id: this.props.id,
+      isOpen: false,
+      newStock: {name : '', uv : 0, quantity : 0, tv:0}
     };
     this.fetchCurrencyRate = this.fetchCurrencyRate.bind(this)
     this.changeName =this.changeName.bind(this)
     this.save =this.save.bind(this)
-    this.countTotal = this.save.bind(this)
+    this.saveStock = this.saveStock.bind(this)
+    this.newStock = this.newStock.bind(this)
 
   }
 
@@ -84,9 +88,43 @@ export default class Portfolio extends React.Component{
     div.setAttribute("hidden", true)
     text.removeAttribute("hidden")
   }
+  //Closes and deletes portfolio
   closePortfolio(e){
     e.stopPropagation();
 
+  }
+  //Toggles modal
+  toggleModal = () => {
+    this.setState({
+      isOpen: !this.state.isOpen
+    });
+  }
+  //Restores new stock to state on change
+  newStock(e) {
+    e.stopPropagation();
+    console.log(e.target)
+    console.log(e.target.value)
+    const n = e.target.id.split('-')[0]
+    let cpy = {...this.state.newStock}
+    cpy[n] = e.target.value
+    console.log(cpy)
+    this.setState({
+      newStock: cpy,
+    });
+  }
+  //Saves stock when clicking 'save'
+  saveStock = () => {
+    if(this.state.newStock.name.length>1 && this.state.newStock.uv > 0 && this.state.newStock.quantity > 0){
+      let newstock =  {...this.state.newStock}
+      newstock.tv = newstock.uv*newstock.quantity
+      var newStocksList = this.state.stocks.concat(newstock)
+      this.setState({
+        stocks: newStocksList,
+        isOpen: !this.state.isOpen
+      });
+    } else {
+      alert('Invalid input')
+    }
   }
 
   render() {
@@ -118,7 +156,7 @@ export default class Portfolio extends React.Component{
         </div>
         <div className="btngroup">
 
-<button className="button" id="desktop" >
+<button onClick={this.toggleModal} className="button" id="desktop" >
 Add in stock
 </button>
 
@@ -130,6 +168,15 @@ Remove selected
 </button>
 
 </div>
+<Modal show={this.state.isOpen}
+          onClose={this.toggleModal}>
+          <form onChange={this.newStock}>
+          Name: <input id={'name-'+this.state.id} type="text"></input>
+          Value: <input id={'uv-'+this.state.id} type="number"></input>
+          Quantity:<input id={'quantity-'+this.state.id} type="number"></input>
+          <button onClick={this.saveStock}type="button">Save</button>
+          </form>
+        </Modal>
         </div>
     )
   }
