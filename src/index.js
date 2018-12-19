@@ -14,7 +14,7 @@ class App extends React.Component {
       portfolio: [
           {
             name: 'Portfolio 1',
-            key: 1,
+            id: 1,
             stocks: [
               {
                 name: 'Reactin perusteet',
@@ -38,7 +38,7 @@ class App extends React.Component {
           },
           {
             name: 'Portfolio 2',
-            key: 2,
+            id: 2,
             stocks: [
               {
                 name: 'Reactin perusteet',
@@ -68,23 +68,22 @@ class App extends React.Component {
     addNewPortfolio (e) {
       e.stopPropagation();
       let len = this.state.portfolio.length +1
-      let newPortfolio = { name: 'Portfolio ' + len, key: len, stocks: []}
+      if(len<=10){
+      let newPortfolio = { name: 'Portfolio ' + len, id: len, stocks: []}
       this.setState({
         portfolio: this.state.portfolio.concat([newPortfolio])
       });
+    } else { 
+      alert('Too many portfolios. Max amount of portfolios is 10.')
+    }
     }
 
     render(){
       //Adds portfolios from state to the page
-      const renObjData = this.state.portfolio.map(function(data, idx) {
-        console.log(data) 
-        return (
-            <Portfolio name={data.name} stocks={data.stocks} key={data.key} />
+      const renObjData = this.state.portfolio.map( data =>
+            <Portfolio name={data.name} stocks={data.stocks} key = {data.id} id={data.key} />
         );
-      });
     return (
-      // <MuiThemeProvider>
-
       <div className="App">
         <header >
 
@@ -97,7 +96,7 @@ class App extends React.Component {
           </div>
         </body>
       </div>
-      // </MuiThemeProvider>
+
   )
     }
 }

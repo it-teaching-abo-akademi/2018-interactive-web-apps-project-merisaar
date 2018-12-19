@@ -9,17 +9,17 @@ export default class Portfolio extends React.Component{
     copyTest = copyTest.forEach(function(st){ 
       st.tv = st.uv*st.quantity
     })
-    console.log(copyTest)
     this.state = {
       stocks: this.props.stocks,
       currency: 'EUR',
       newName: '',
       name: this.props.name,
-      key: this.props.key,
+      id: this.props.id,
     };
     this.fetchCurrencyRate = this.fetchCurrencyRate.bind(this)
     this.changeName =this.changeName.bind(this)
     this.save =this.save.bind(this)
+    this.countTotal = this.save.bind(this)
 
   }
 
@@ -72,27 +72,32 @@ export default class Portfolio extends React.Component{
   //Change name by clicking save button
   save(e){
     e.stopPropagation();
-    this.setState({
-      name: this.state.newName})
+    if(this.state.newName.trim().length>1){
+      this.setState({
+        name: this.state.newName.trim()})
+    } else {
+      alert('Name too short')
+    }
     let div = e.target.parentElement
     let text = div.nextSibling
     console.log(text)
     div.setAttribute("hidden", true)
     text.removeAttribute("hidden")
   }
-  
+  closePortfolio(e){
+    e.stopPropagation();
+
+  }
 
   render() {
-
-    const renObjData = this.state.stocks.map(function(data, idx) {
-      return (
-          <Stock stock ={data} key={idx} />
+    const renObjData = this.state.stocks.map((data, index) =>
+          <Stock stock ={data} key={index} />
         );
-      });
 
     return (
-      <div className="card item2">
-      <div  ><div hidden><input onChange={this.changeName} id={this.props.name}></input><button onClick={this.save}>Save</button></div><p onClick={this.hideTextShowInput}>{this.state.name}</p></div>
+      <div className="card">
+      <button onClick ={this.closePortfolio} className = 'close' ></button>
+      <div><div hidden><input onChange={this.changeName} id={this.props.name}></input><button onClick={this.save}>Save</button></div><p onClick={this.hideTextShowInput}>{this.state.name}</p></div>
        <div className="btngroup">
             <button onClick={(e) => {this.fetchCurrencyRate(e, 'USD', 'EUR')}} className="button" id="desktop" >
             Show in €
@@ -105,7 +110,7 @@ export default class Portfolio extends React.Component{
     <div className="table-wrapper">
         <table className="blueTable">
         <tbody>
-          <tr><th>Name</th><th>Value</th><th>Quantity</th><th>Total</th></tr>
+          <tr><th>Name</th><th>Value</th><th>Quantity</th><th>Total</th><th>Select</th></tr>
           {renObjData}
           </tbody>
 
@@ -129,64 +134,3 @@ Remove selected
     )
   }
 }
-// export const Portfolio = (props) => {
-//   const renObjData = props.stocks.all.map(function(data, idx) {
-//     return (
-//         <Stock name={data.name} key={idx} />
-//       );
-//     });
-
-//   const fetchCurrencyRate = (cur1, cur2) => {
-//     fetch('https://free.currencyconverterapi.com/api/v6/convert?q='+ cur1 +'_' + cur2)
-//       .then(response => response.json())
-//       .then(data => {
-//         console.log(data.results)
-//       })
-//   }
-
-//   const fetchCurrencyRate = (cur1, cur2) => {
-//     fetch('https://free.currencyconverterapi.com/api/v6/convert?q='+ cur1 +'_' + cur2)
-//       .then(response => response.json())
-//       .then(data => {
-//         console.log(data.results)
-//       })
-//   }
-
-//   return (
-//       <div className="card">
-//        <div className="btngroup">
-//             <button onClick={fetchCurrencyRate('USD', 'EUR')} className="button" id="desktop" >
-//             Show in €
-//           </button>
-//             <button onClick={fetchCurrencyRate('EUR', 'USD')} className="button" id="mobile" >
-//             show in $
-//           </button>
-
-//     </div>
-//     <div className="table-wrapper">
-//         <table className="blueTable">
-//         <tbody>
-//           <tr><th>Name</th><th>Name</th><th>Name</th></tr>
-//           {renObjData}
-//           </tbody>
-
-//         </table>
-//         </div>
-//         <div className="btngroup">
-
-// <button className="button" id="desktop" >
-// Add in stock
-// </button>
-
-// <button className="button" id="mobile" >
-// Perf graph
-// </button>
-// <button className="button" id="mobile" >
-// Remove selected
-// </button>
-
-// </div>
-//         </div>
-    
-//   )
-// }
