@@ -151,40 +151,57 @@ export default class Portfolio extends React.Component{
 
   }
   async fetchStockData(name){
-    // await fetch('https://www.alphavantage.co/query?function='+name+'&symbol=USDEUR&interval=weekly&time_period=10&series_type=open&apikey=XDNRE3YNSC6MJXBQ')
-    await fetch('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MSFT&apikey=demo')    
+    return await fetch('https://www.alphavantage.co/query?function='+name+'&symbol=USDEUR&interval=weekly&time_period=10&series_type=open&apikey=XDNRE3YNSC6MJXBQ')
+    // return await fetch('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MSFT&apikey=demo')    
     .then(response => response.json())
     .then(data => {
-      // console.log(data)
-      // console.log(data['Technical Analysis: ' + name])
-      // let dataL = data['Technical Analysis: ' + name]
-      // let days = Object.keys(dataL)
-      // days = days.slice(-10)
-      // console.log(days)
-      // let test = []
-      // test = days.map(day => test.concat(dataL[day])[0])
+      let dataL = data['Technical Analysis: ' + name]
+      let days = Object.keys(dataL)
+      days = days.slice(0,10)
+      let test = []
+      test = days.map(day => test.concat(dataL[day])[0])
       // let sD = Object.assign([], this.state.stockData)
       // sD = sD.concat(test)
       // console.log(sD)
       // this.setState({stockData: sD})
-      // return sD
-      console.log(data)
-      return data
+      return [test, days]
+      // console.log(data['Time Series (Daily)'])
+      // return data['Time Series (Daily)']
     })
   }
   async drawCurveTypes() {
     let stocks = this.state.stocks
-    // console.log(stocks)
-    let data = Object.assign([], this.state.chartData)
+    // let data = Object.assign([], this.state.chartData)
     let list = ['Time']
     let nameList = stocks.map(l => l.name)
     list = list.concat(nameList)
-    data = data.concat(list)
+    // data = data.concat(list)
+    let sD = []
+    let realList = []
+    realList.push(list)
     await Promise.all(nameList.map(async (name) => 
       this.fetchStockData(name))).then(function(result) {
-        console.log(result.type)
+        // console.log('result ', result)
+        sD = result
       })
-    // console.log(dataList)
+    console.log('sD length: ', sD.length)
+    for(var i = 0; i<sD[0][0].length; i++){
+      
+      let dataPoints = []
+      dataPoints = [sD[0][1][0]]
+      for(var j = 0; j<sD.length; j++){
+        console.log('TEST', sD[j][0][i])
+        dataPoints = dataPoints.concat(parseFloat(Object.values(sD[j][0][i])[0]))
+        console.log('dataPoints ', dataPoints)
+      }
+      realList.push(dataPoints)
+      console.log('reallist ', realList)
+      
+    }
+    console.log(realList)
+    this.setState({
+      stockData: realList,
+    });
   }
 
   render() {
@@ -222,7 +239,7 @@ export default class Portfolio extends React.Component{
           chartType="LineChart"
           width="100%"
           height="400px"
-          data={data}
+          data={this.state.stockData}
           options={options}
         />
     <div className="table-wrapper">
