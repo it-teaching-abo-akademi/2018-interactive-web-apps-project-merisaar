@@ -1,8 +1,9 @@
 import React from 'react'
 import Stock from './stockData.js'
 import '../App.css';
-import Modal from './Modal';
+import PopUp from './Popup';
 import Chart from "react-google-charts";
+import Modal from 'react-responsive-modal';
 
 export default class Portfolio extends React.Component{
   constructor(props) {
@@ -92,11 +93,7 @@ export default class Portfolio extends React.Component{
     div.setAttribute("hidden", true)
     text.removeAttribute("hidden")
   }
-  //Closes and deletes portfolio
-  closePortfolio(e){
-    e.stopPropagation();
 
-  }
   //Toggles modal
   toggleModal = () => {
     this.setState({
@@ -150,68 +147,63 @@ export default class Portfolio extends React.Component{
     this.setState({stocks: stocksCpy});
 
   }
+  //Fetches stock data for past 10 recorded dates
   async fetchStockData(name){
     return await fetch('https://www.alphavantage.co/query?function='+name+'&symbol=USDEUR&interval=weekly&time_period=10&series_type=open&apikey=XDNRE3YNSC6MJXBQ')
-    // return await fetch('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MSFT&apikey=demo')    
     .then(response => response.json())
     .then(data => {
-      let dataL = data['Technical Analysis: ' + name]
-      let days = Object.keys(dataL)
-      days = days.slice(0,10)
-      let test = []
-      test = days.map(day => test.concat(dataL[day])[0])
-      // let sD = Object.assign([], this.state.stockData)
-      // sD = sD.concat(test)
-      // console.log(sD)
-      // this.setState({stockData: sD})
-      return [test, days]
-      // console.log(data['Time Series (Daily)'])
-      // return data['Time Series (Daily)']
+      console.log(data)
+      if(Object.keys(data)[0] === 'Note'){
+        alert('Only 5 request are allowed in one minute (by API)')
+      }else {
+        let dataL = data['Technical Analysis: ' + name]
+        let days = Object.keys(dataL)
+        days = days.slice(0,10)
+        let test = []
+        test = days.map(day => test.concat(dataL[day])[0])
+        return [test, days]
+      }
     })
   }
   async drawCurveTypes() {
     let stocks = this.state.stocks
-    // let data = Object.assign([], this.state.chartData)
     let list = ['Time']
     let nameList = stocks.map(l => l.name)
     list = list.concat(nameList)
-    // data = data.concat(list)
     let sD = []
     let realList = []
+    let isUndefined = false
     realList.push(list)
     await Promise.all(nameList.map(async (name) => 
       this.fetchStockData(name))).then(function(result) {
-        // console.log('result ', result)
         sD = result
       })
-    console.log('sD length: ', sD.length)
+    console.log(sD)
     for(var i = 0; i<sD[0][0].length; i++){
-      
       let dataPoints = []
       dataPoints = [sD[0][1][0]]
       for(var j = 0; j<sD.length; j++){
-        console.log('TEST', sD[j][0][i])
+        if(typeof(sD[j][0]==='undefined')){
+          console.log('Nothing here')
+          isUndefined = true
+          break;
+        }
         dataPoints = dataPoints.concat(parseFloat(Object.values(sD[j][0][i])[0]))
-        console.log('dataPoints ', dataPoints)
       }
       realList.push(dataPoints)
-      console.log('reallist ', realList)
       
     }
-    console.log(realList)
-    this.setState({
-      stockData: realList,
-    });
+    if(isUndefined === false){
+      console.log(realList)
+      this.setState({
+        stockData: realList,
+      });
+    } else {
+      alert('Only 5 request are allowed in one minute (by API)')
+    }
   }
 
   render() {
-    const data = [
-      ["Year", "Sales", "Expenses"],
-      ["2004", 1000, 400],
-      ["2005", 1170, 460],
-      ["2006", 660, 1120],
-      ["2007", 1030, 540]
-    ];
     const options = {
       title: "Stock value",
       curveType: "function",
@@ -224,7 +216,7 @@ export default class Portfolio extends React.Component{
     return (
       <div className="card">
       <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-      <button onClick ={this.closePortfolio} className = 'close' ></button>
+      <button onClick={(e) => {this.props.closePortfolio(e, this.state.id)}} className = 'close' ></button>
       <div><div hidden><input onChange={this.changeName} id={this.props.name}></input><button onClick={this.save}>Save</button></div><p onClick={this.hideTextShowInput}>{this.state.name}</p></div>
        <div className="btngroup">
             <button onClick={(e) => {this.fetchCurrencyRate(e, 'USD', 'EUR')}} className="button" id="desktop" >
@@ -253,34 +245,34 @@ export default class Portfolio extends React.Component{
         </div>
         <div className="btngroup">
 
-<button onClick={this.toggleModal} className="button" id="desktop" >
-Add in stock
-</button>
+        <button onClick={this.toggleModal} className="button" id="desktop" >
+        Add in stock
+        </button>
 
-<button onClick={this.drawCurveTypes} className="button" id="mobile" >
-Perf graph
-</button>
-<button onClick={this.removeSelected} className="button" id="mobile" >
-Remove selected
-</button>
+        <button onClick={this.drawCurveTypes} className="button" id="mobile" >
+        Perf graph
+        </button>
+        <button onClick={this.removeSelected} className="button" id="mobile" >
+        Remove selected
+        </button>
 
-</div>
-<Modal show={this.state.isOpen}
-          onClose={this.toggleModal}>
-          <form onChange={this.newStock}>
-          Name: <input id={'name-'+this.state.id} type="text"></input>
-          Value: <input id={'uv-'+this.state.id} type="number"></input>
-          Quantity:<input id={'quantity-'+this.state.id} type="number"></input>
-          <button onClick={this.saveStock}type="button">Save</button>
-          </form>
-        </Modal>
-<Modal show={this.state.modalIsOpen}
-          onClose={this.toggleModal}>
-          <div id="chart_div"></div>
-        </Modal>
         </div>
-     
-      
-    )
-  }
-}
+        <PopUp show={this.state.isOpen}
+                  onClose={this.toggleModal}>
+                  <form onChange={this.newStock}>
+                  Name: <input id={'name-'+this.state.id} type="text"></input>
+                  Value: <input id={'uv-'+this.state.id} type="number"></input>
+                  Quantity:<input id={'quantity-'+this.state.id} type="number"></input>
+                  <button onClick={this.saveStock}type="button">Save</button>
+                  </form>
+                </PopUp>
+        <Modal show={this.state.modalIsOpen}
+                  onClose={this.toggleModal}>
+                  <div id="chart_div"></div>
+                </Modal>
+                </div>
+            
+              
+            )
+          }
+        }

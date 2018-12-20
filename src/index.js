@@ -1,11 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-// import App from './App';
 import * as serviceWorker from './serviceWorker';
-// import logo from './logo.svg';
 import './App.css';
 import Portfolio from './components/portfolio.js'
-// import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 class App extends React.Component {
   constructor() {
@@ -75,6 +72,7 @@ class App extends React.Component {
         ]
       }
       this.addNewPortfolio = this.addNewPortfolio.bind(this);
+      this.closePortfolio = this.closePortfolio.bind(this)
     }
     //Adds new empty portfolio
     addNewPortfolio (e) {
@@ -89,11 +87,21 @@ class App extends React.Component {
       alert('Too many portfolios. Max amount of portfolios is 10.')
     }
     }
+    //Closes and deletes portfolio
+    closePortfolio(e, id){
+      e.stopPropagation();
+      console.log('close portfolio id: ' + id)
+      let portfolios = [...this.state.portfolio]
+      console.log(portfolios)
+      let selected = portfolios.filter(portfolio => portfolio.id !==  id)
+      console.log(selected)
+      this.setState({portfolio: selected});
+  }
 
     render(){
       //Adds portfolios from state to the page
       const renObjData = this.state.portfolio.map( data =>
-            <Portfolio name={data.name} stocks={data.stocks} key = {data.id} id={data.id} />
+            <Portfolio name={data.name} stocks={data.stocks} closePortfolio={this.closePortfolio} key = {data.id} id={data.id} />
         );
     return (
       <div className="App">
@@ -115,8 +123,8 @@ class App extends React.Component {
 }
 
 
-ReactDOM.render(<App />, document.getElementById('root'));
 
+ReactDOM.render(<App />, document.getElementById('root'));
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: http://bit.ly/CRA-PWA
