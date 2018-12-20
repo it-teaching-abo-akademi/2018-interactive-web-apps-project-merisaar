@@ -1,0 +1,16 @@
+@import '~antd/dist/antd.css';
+.customModal{
+  width: 50%;
+  background-color: salmon;
+
+}
+.customOverLay{
+  background-color: salmon;
+}
+.modal{
+  width: 50%;
+  margin-left: 25%;
+}
+/* .overLay{
+  background-color: salmon;
+} */

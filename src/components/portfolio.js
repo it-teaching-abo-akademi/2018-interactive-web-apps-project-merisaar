@@ -2,8 +2,10 @@ import React from 'react'
 import Stock from './stockData.js'
 import '../App.css';
 import PopUp from './Popup';
+import drawGraph from './graphDraw';
 import Chart from "react-google-charts";
 import Modal from 'react-responsive-modal';
+import styles from '../custom-styling.css';
 
 export default class Portfolio extends React.Component{
   constructor(props) {
@@ -19,18 +21,21 @@ export default class Portfolio extends React.Component{
       name: this.props.name,
       id: this.props.id,
       isOpen: false,
+      open: false,
       newStock: {name : '', uv : 0, quantity : 0, tv:0},
       chartData: [],
       stockData: [],
     };
     this.fetchCurrencyRate = this.fetchCurrencyRate.bind(this)
     this.changeName =this.changeName.bind(this)
-    this.save =this.save.bind(this)
+    this.saveNameChange =this.saveNameChange.bind(this)
+    this.cancelNameChange =this.cancelNameChange.bind(this)
     this.saveStock = this.saveStock.bind(this)
     this.newStock = this.newStock.bind(this)
     this.removeSelected = this.removeSelected.bind(this)
     this.setChecked = this.setChecked.bind(this)
     this.drawCurveTypes = this.drawCurveTypes.bind(this)
+    this.onOpenModal = this.onOpenModal.bind(this)
   }
 
   //Fetches currency rate from API on click
@@ -78,8 +83,8 @@ export default class Portfolio extends React.Component{
       newName:e.target.value,
     })
   }
-  //Change name by clicking save button
-  save(e){
+  //Saves modified name
+  saveNameChange(e){
     e.stopPropagation();
     if(this.state.newName.trim().length>1){
       this.setState({
@@ -89,26 +94,41 @@ export default class Portfolio extends React.Component{
     }
     let div = e.target.parentElement
     let text = div.nextSibling
-    console.log(text)
+    div.setAttribute("hidden", true)
+    text.removeAttribute("hidden")
+  }
+  
+  cancelNameChange(e){
+    let div = e.target.parentElement
+    let text = div.nextSibling
     div.setAttribute("hidden", true)
     text.removeAttribute("hidden")
   }
 
-  //Toggles modal
-  toggleModal = () => {
+  //Toggles popup
+  popUpModal = () => {
     this.setState({
       isOpen: !this.state.isOpen
     });
   }
+  //Opens modal and draws graph
+  onOpenModal = (e) => {
+    e.stopPropagation();
+    this.setState({ open: true });
+    this.drawCurveTypes()
+  };
+
+  //Closes modal
+  onCloseModal = () => {
+    this.setState({ open: false });
+  };
+
   //Restores new stock to state on change
   newStock(e) {
     e.stopPropagation();
-    console.log(e.target)
-    console.log(e.target.value)
     const n = e.target.id.split('-')[0]
     let cpy = {...this.state.newStock}
     cpy[n] = e.target.value
-    console.log(cpy)
     this.setState({
       newStock: cpy,
     });
@@ -152,13 +172,13 @@ export default class Portfolio extends React.Component{
     return await fetch('https://www.alphavantage.co/query?function='+name+'&symbol=USDEUR&interval=weekly&time_period=10&series_type=open&apikey=XDNRE3YNSC6MJXBQ')
     .then(response => response.json())
     .then(data => {
-      console.log(data)
-      if(Object.keys(data)[0] === 'Note'){
+      if(Object.keys(data)[0] === 'Note' || Object.keys(data)[0] === 'Error Message'){
         alert('Only 5 request are allowed in one minute (by API)')
       }else {
+        console.log(data)
         let dataL = data['Technical Analysis: ' + name]
         let days = Object.keys(dataL)
-        days = days.slice(0,10)
+        days = days.slice(0,10).reverse()
         let test = []
         test = days.map(day => test.concat(dataL[day])[0])
         return [test, days]
@@ -179,20 +199,24 @@ export default class Portfolio extends React.Component{
         sD = result
       })
     console.log(sD)
+    try{
     for(var i = 0; i<sD[0][0].length; i++){
       let dataPoints = []
-      dataPoints = [sD[0][1][0]]
+      dataPoints = [sD[0][1][i]]
       for(var j = 0; j<sD.length; j++){
-        if(typeof(sD[j][0]==='undefined')){
-          console.log('Nothing here')
-          isUndefined = true
-          break;
-        }
         dataPoints = dataPoints.concat(parseFloat(Object.values(sD[j][0][i])[0]))
+      }
+      if(!Array.isArray(dataPoints)){
+        console.log(dataPoints)
+        isUndefined = true
+        break;
       }
       realList.push(dataPoints)
       
     }
+  }catch{
+    console.log('error') 
+  }
     if(isUndefined === false){
       console.log(realList)
       this.setState({
@@ -217,7 +241,7 @@ export default class Portfolio extends React.Component{
       <div className="card">
       <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
       <button onClick={(e) => {this.props.closePortfolio(e, this.state.id)}} className = 'close' ></button>
-      <div><div hidden><input onChange={this.changeName} id={this.props.name}></input><button onClick={this.save}>Save</button></div><p onClick={this.hideTextShowInput}>{this.state.name}</p></div>
+      <div><div hidden><input onChange={this.changeName} id={this.props.name}></input><button onClick={this.saveNameChange}>Save</button><button onClick={this.cancelNameChange}>Cancel</button></div><p onClick={this.hideTextShowInput}>{this.state.name}</p></div>
        <div className="btngroup">
             <button onClick={(e) => {this.fetchCurrencyRate(e, 'USD', 'EUR')}} className="button" id="desktop" >
             Show in €
@@ -226,14 +250,8 @@ export default class Portfolio extends React.Component{
             show in $
           </button>
 
-    </div>
-    <Chart
-          chartType="LineChart"
-          width="100%"
-          height="400px"
-          data={this.state.stockData}
-          options={options}
-        />
+      </div>
+  
     <div className="table-wrapper">
         <table className="blueTable">
         <tbody>
@@ -245,11 +263,11 @@ export default class Portfolio extends React.Component{
         </div>
         <div className="btngroup">
 
-        <button onClick={this.toggleModal} className="button" id="desktop" >
+        <button onClick={this.popUpModal} className="button" id="desktop" >
         Add in stock
         </button>
 
-        <button onClick={this.drawCurveTypes} className="button" id="mobile" >
+        <button onClick={this.onOpenModal} className="button" id="mobile" >
         Perf graph
         </button>
         <button onClick={this.removeSelected} className="button" id="mobile" >
@@ -258,7 +276,7 @@ export default class Portfolio extends React.Component{
 
         </div>
         <PopUp show={this.state.isOpen}
-                  onClose={this.toggleModal}>
+                  onClose={this.popUpModal}>
                   <form onChange={this.newStock}>
                   Name: <input id={'name-'+this.state.id} type="text"></input>
                   Value: <input id={'uv-'+this.state.id} type="number"></input>
@@ -266,10 +284,24 @@ export default class Portfolio extends React.Component{
                   <button onClick={this.saveStock}type="button">Save</button>
                   </form>
                 </PopUp>
-        <Modal show={this.state.modalIsOpen}
-                  onClose={this.toggleModal}>
-                  <div id="chart_div"></div>
-                </Modal>
+        <Modal 
+        open={this.state.open} 
+        onClose={this.onCloseModal} 
+        center
+        classNames={{
+          overlay: styles.customOverlay,
+          modal: styles.customModal,
+        }}
+        >
+        <h2>Graph</h2>>
+        <Chart
+          chartType="LineChart"
+          width="700px"
+          height="400px"
+          data={this.state.stockData}
+          options={options}
+        />
+        </Modal>
                 </div>
             
               

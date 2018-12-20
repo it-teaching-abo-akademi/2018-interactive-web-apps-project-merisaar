@@ -90,11 +90,8 @@ class App extends React.Component {
     //Closes and deletes portfolio
     closePortfolio(e, id){
       e.stopPropagation();
-      console.log('close portfolio id: ' + id)
       let portfolios = [...this.state.portfolio]
-      console.log(portfolios)
       let selected = portfolios.filter(portfolio => portfolio.id !==  id)
-      console.log(selected)
       this.setState({portfolio: selected});
   }
 
