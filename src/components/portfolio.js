@@ -151,25 +151,21 @@ export default class Portfolio extends React.Component{
   //Count total value of stocks
   countTotal=()=>{
     let stocks = [...this.state.stocks]
-    console.log(stocks)
     let total = 0 
     for(var i = 0; i<stocks.length; i++){
-      console.log(parseFloat(stocks[i].tv))
       total = parseFloat(stocks[i].tv) + total
     }
-    console.log(total)
+    total = total.toFixed(2)
     this.setState({
       totalValuOfStocks: total
     })
   }
   //Saves and add stock when clicking 'save'
   saveStock = () => {
-    if(this.state.newStock.name.length>1 && this.state.newStock.quantity > 0){
+    if(this.state.newStock.name.length>0 && this.state.newStock.quantity > 0){
       let newstock =  {...this.state.newStock}
-      console.log(newstock)
-      let name = newstock.name.toUpperCase()
-      console.log(newstock.quantity)
-      if(name.trim().length<=0){
+      let name = newstock.name.toUpperCase().trim()
+      if(name.trim().length<1){
         alert('Name is too short')
       } else if(newstock.quantity % 1 !== 0){
         alert("Quantity has to be a whole number")
@@ -191,17 +187,12 @@ export default class Portfolio extends React.Component{
               let totalv = newstock.uv*newstock.quantity
               newstock.tv = totalv.toFixed(2)
               newstock.checked = false
-              let total = parseFloat(this.state.totalValuOfStocks)
-              total = parseFloat(total)
-              total = totalv + total
-              console.log('total ',total)
               let len = this.state.stocks.length + 1
               newstock.id = 'stock' + this.state.id + len 
               var newStocksList = this.state.stocks.concat(newstock)
               this.setState({
                 stocks: newStocksList,
                 isOpen: !this.state.isOpen,
-                totalValuOfStocks: total,
             }, () => {
               this.props.updatePortfolioState(this.state.id, this.state.stocks, this.state.name);
               this.countTotal()
@@ -210,6 +201,8 @@ export default class Portfolio extends React.Component{
           })
         }
       }
+    } else {
+      alert('Invalid input')
     }
   }
   //Removes selected columns and stocks
@@ -221,6 +214,9 @@ export default class Portfolio extends React.Component{
       stocks: selected}, () => {
     this.props.updatePortfolioState(this.state.id, this.state.stocks, this.state.name)
     this.countTotal()
+    var clist = document.getElementsByTagName("input");
+    for (var i = 0; i < clist.length; ++i) { clist[i].checked = false; }
+ 
   });
   }
   //Sets checked to true in state stock when clicking the checkbox
