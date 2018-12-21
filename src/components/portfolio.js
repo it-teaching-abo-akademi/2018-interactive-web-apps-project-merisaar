@@ -154,6 +154,9 @@ export default class Portfolio extends React.Component{
     if(this.state.newStock.name.length>1 && this.state.newStock.quantity > 0){
       let newstock =  {...this.state.newStock}
       let name = newstock.name
+      if(this.state.stocks.length>=50){
+        alert('Maximum number of portfolios is 50')
+      } else {
         fetch('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol='+name+'&apikey=XDNRE3YNSC6MJXBQ')
         .then(response => response.json())
         .then(data => {
@@ -179,6 +182,7 @@ export default class Portfolio extends React.Component{
           }
         })
       }
+    }
   }
   //Removes selected columns and stocks
   removeSelected (e) {

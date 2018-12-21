@@ -16,68 +16,6 @@ class App extends React.Component {
     }
     this.state = {
       portfolio: pf, 
-      // portfolio: [
-      //     {
-      //       name: 'Portfolio 1',
-      //       id: 1,
-      //       stocks: [
-      //         {
-      //           id: 'stock11',
-      //           name: 'ADX',
-      //           uv: 4.3,
-      //           quantity:10,
-      //           tv: 0,
-      //           checked: false,
-      //         },
-      //         {
-      //           id: 'stock12',
-      //           name: 'SMA',
-      //           uv: 2.64,
-      //           quantity:4,
-      //           tv: 0,
-      //           checked: false,
-      //         },
-      //         {
-      //           id: 'stock13',
-      //           name: 'EMA',
-      //           uv: 40.32,
-      //           quantity:1,
-      //           tv: 0,
-      //           checked: false,
-      //         }
-      //       ]
-      //     },
-      //     {
-      //       name: 'Portfolio 2',
-      //       id: 2,
-      //       stocks: [
-      //         {
-      //           id: 'stock21',
-      //           name: 'DEMA',
-      //           uv: 4.3,
-      //           quantity:10,
-      //           tv: 0,
-      //           checked: false,
-      //         },
-      //         {
-      //           id: 'stock22',
-      //           name: 'MOM',
-      //           uv: 2.64,
-      //           quantity:4,
-      //           tv: 0,
-      //           checked: false,
-      //         },
-      //         {
-      //           id: 'stock23',
-      //           name: 'PPO',
-      //           uv: 40.32,
-      //           quantity:1,
-      //           tv: 0,
-      //           checked: false,
-      //         }
-      //       ]
-      //     }
-      //   ]
       }
       this.addNewPortfolio = this.addNewPortfolio.bind(this);
       this.closePortfolio = this.closePortfolio.bind(this)
@@ -126,8 +64,8 @@ class App extends React.Component {
 
     render(){
       //Adds portfolios from state to the page
-      const renObjData = this.state.portfolio.map( data =>
-            <Portfolio name={data.name} totalValue={0} updatePortfolioState={this.updatePortfolioState} stocks={data.stocks} closePortfolio={this.closePortfolio} key = {data.id} id={data.id} />
+      const renObjData = this.state.portfolio.map( (data,index) =>
+            <Portfolio name={data.name} totalValue={0} updatePortfolioState={this.updatePortfolioState} stocks={data.stocks} closePortfolio={this.closePortfolio} key = {index} id={data.id} />
         );
     return (
       <div className="App">
