@@ -40,13 +40,7 @@
     border: 1% black solid;
     background: #369;
 }
-.myBox {
-  border: none;
-  padding: 5%;
-  font: 24px/36px sans-serif;
-  width: 80%;
-  height: 25%;
-  }
+
   /* Scrollbar styles */
 ::-webkit-scrollbar {
   width: 1.5%;
@@ -177,7 +171,19 @@
     transition-duration: 0.4s;
     cursor: pointer;
   }
-  
+  .addPortfolio button{
+    background-color: rgb(236, 175, 150); 
+    border: 1px solid black;
+    color: black;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 90%;
+    -webkit-transition-duration: 0.4s; 
+    transition-duration: 0.4s;
+    cursor: pointer;
+  }
   .btn-group {
     display: flex;
     flex-direction: row;
@@ -202,13 +208,12 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    height: 50%;
     width: auto;
     padding:5%;
     max-width: 500px;
+    min-height: 500px;
     float:left;
   }
-  
   
   /* Clear floats (clearfix hack) */
   .btn-group:after {
@@ -225,7 +230,7 @@
     margin: 3%;
   }
   .table-wrapper {
-    max-width: 100%;
+    width: 100%;
     height:200px;
     overflow:scroll;  
   }
