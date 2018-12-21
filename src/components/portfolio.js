@@ -2,7 +2,7 @@ import React from 'react'
 import Stock from './stockData.js'
 import '../App.css';
 import PopUp from './Popup';
-import drawGraph from './graphDraw';
+// import drawGraph from './graphDraw';
 import Chart from "react-google-charts";
 import Modal from 'react-responsive-modal';
 import styles from '../custom-styling.css';
@@ -115,7 +115,7 @@ export default class Portfolio extends React.Component{
   onOpenModal = (e) => {
     e.stopPropagation();
     this.setState({ open: true });
-    this.drawCurveTypes()
+    this.drawCurveTypes(e)
   };
 
   //Closes modal
@@ -177,54 +177,113 @@ export default class Portfolio extends React.Component{
       }else {
         console.log(data)
         let dataL = data['Technical Analysis: ' + name]
-        let days = Object.keys(dataL)
-        days = days.slice(0,10).reverse()
-        let test = []
-        test = days.map(day => test.concat(dataL[day])[0])
-        return [test, days]
+        let days = Object.keys(dataL).reverse()
+        let values = []
+        values = days.map(day => values.concat(dataL[day])[0])
+        return [values, days]
       }
     })
   }
-  async drawCurveTypes() {
+  // //Fetches stock data for past 10 recorded dates
+  // async fetchStockDataValue(name){
+  //   return await fetch('https://www.alphavantage.co/query?function='+name+'&symbol=USDEUR&interval=weekly&time_period=10&series_type=open&apikey=XDNRE3YNSC6MJXBQ')
+  //   .then(response => response.json())
+  //   .then(data => {
+  //     if(Object.keys(data)[0] === 'Note' || Object.keys(data)[0] === 'Error Message'){
+  //       alert('Only 5 request are allowed in one minute (by API)')
+  //     }else {
+  //       console.log(data)
+  //       let dataL = data['Technical Analysis: ' + name]
+  //       let days = Object.keys(dataL)
+  //       days = days.reverse()
+  //       console.log(days)
+  //       let test = []
+  //       test = days.map(day => test.concat(dataL[day])[0])
+  //       return [test, days]
+  //     }
+  //   })
+  // }
+  async drawCurveTypes(e) {
     let stocks = this.state.stocks
-    let list = ['Time']
     let nameList = stocks.map(l => l.name)
-    list = list.concat(nameList)
     let sD = []
-    let realList = []
-    let isUndefined = false
-    realList.push(list)
+
     await Promise.all(nameList.map(async (name) => 
-      this.fetchStockData(name))).then(function(result) {
-        sD = result
+      this.fetchStockData(name))).then(result => {
+        sD = [...result];
+        this.setState({stockData: Object.assign([], result)});
       })
+
+    let time1 = sD[0][1][sD[0][1].length-11]
+    let time2 = sD[0][1][sD[0][1].length-1]
+    console.log(time1, ' ',time2)
+    this.addListToSelectTag(sD[0][1], ['time1', 'time2'])
     console.log(sD)
-    try{
-    for(var i = 0; i<sD[0][0].length; i++){
-      let dataPoints = []
-      dataPoints = [sD[0][1][i]]
-      for(var j = 0; j<sD.length; j++){
-        dataPoints = dataPoints.concat(parseFloat(Object.values(sD[j][0][i])[0]))
-      }
-      if(!Array.isArray(dataPoints)){
-        console.log(dataPoints)
-        isUndefined = true
-        break;
-      }
-      realList.push(dataPoints)
-      
-    }
-  }catch{
-    console.log('error') 
+
+    this.drawGraph(e, time1, time2)
   }
-    if(isUndefined === false){
-      console.log(realList)
-      this.setState({
-        stockData: realList,
-      });
+
+  drawGraph(e, time1, time2){
+    e.stopPropagation()
+    // let sD = [...this.state.stockData]
+    let sD = Object.assign([], this.state.stockData)
+    console.log('SD ',sD)
+    console.log(time1,time2)
+    let idx1 = sD[0][1].indexOf(time1)
+    let idx2 = sD[0][1].indexOf(time2)
+    console.log(idx1, idx2)
+    if(!(idx1 <= idx2)){
+      alert('Time invalid')
     } else {
-      alert('Only 5 request are allowed in one minute (by API)')
-    }
+      // console.log(sD)
+      let stocks = [...this.state.stocks]
+      let list = ['Time']
+      let namelist = stocks.map(l => l.name)
+      list =list.concat(namelist)
+
+      let isUndefined = false
+      let realList = []
+      realList.push(list)
+
+
+      // let timeList = 
+      try{
+        for(var i = idx1; i<idx2; i++){
+          let dataPoints = []
+          dataPoints = [sD[0][1][i]]
+          for(var j = 0; j<sD.length; j++){
+            dataPoints = dataPoints.concat(parseFloat(Object.values(sD[j][0][i])[0]))
+          }
+          if(!Array.isArray(dataPoints)){
+            // console.log(dataPoints)
+            isUndefined = true
+            break;
+          }
+          realList.push(dataPoints)
+          console.log(realList)
+        }
+      }catch{
+        console.log('error') 
+      }
+      if(isUndefined === false){
+        console.log(realList)
+        this.setState({
+          chartData: realList,
+        });
+      } else {
+        alert('Only 5 request are allowed in one minute (by API)')
+      }
+      }
+  }
+  addListToSelectTag(list, selectIdList) {
+    for(var j = 0; j<selectIdList.length; j++){  
+      let select = document.getElementById(selectIdList[j])
+      for(var i = 0; i<list.length; i++){
+        var option = document.createElement("option")
+        option.text = list[i]
+        select.add(option)
+        }
+      }
   }
 
   render() {
@@ -293,12 +352,16 @@ export default class Portfolio extends React.Component{
           modal: styles.customModal,
         }}
         >
-        <h2>Graph</h2>>
+        <h2>Graph</h2>
+        Search by time
+        <select id='time1'><option>Select starting time</option></select>
+        <select id='time2'><option>Select ending time</option></select>        
+        <button onClick={(e) => {this.drawGraph(e, document.getElementById('time1').value, document.getElementById('time2').value)}}>Search</button>
         <Chart
           chartType="LineChart"
           width="700px"
           height="400px"
-          data={this.state.stockData}
+          data={this.state.chartData}
           options={options}
         />
         </Modal>
