@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/2018-interactive-web-apps-project-merisaar/precache-manifest.375f1351a1fbab9660ea52577ac228bd.js"
+  "/2018-interactive-web-apps-project-merisaar/precache-manifest.188b8eb52678972b0fa3a5499b67f88c.js"
 );
 
 workbox.clientsClaim();
