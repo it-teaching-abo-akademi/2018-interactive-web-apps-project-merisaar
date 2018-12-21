@@ -8,14 +8,14 @@ class App extends React.Component {
   constructor() {
     super();
     let pf = localStorage.getItem('portfolio')
-    console.log(pf)
     if(pf !== null){
-      pf = JSON.parse(pf)
+      // pf = JSON.parse(pf)
+      pf=[]
     } else {
       pf = []
     }
     this.state = {
-      portfolio: pf, 
+      portfolio: pf,
       }
       this.addNewPortfolio = this.addNewPortfolio.bind(this);
       this.closePortfolio = this.closePortfolio.bind(this)
@@ -39,12 +39,23 @@ class App extends React.Component {
       this.setState({portfolio: pfCopy})
       this.onSetResult(pfCopy, 'portfolio')
     }
+    //Counts max id
+    setId(){
+      let pC = [...this.state.portfolio]
+      let list =[];
+      list = list.concat(0)
+      let idList = pC.map(p => p.id)
+      idList.map(id => list = list.concat(id))
+      let max = (Math.max(...list)) + 1
+      return max
+    }
     //Adds new empty portfolio
     addNewPortfolio (e) {
       e.stopPropagation();
       let len = this.state.portfolio.length +1
+      let id = this.setId()
       if(len<=10){
-      let newPortfolio = { name: 'Portfolio ' + len, id: len, stocks: []}
+      let newPortfolio = { name: 'Portfolio ' + len, id: id, stocks: []}
       this.setState({
         portfolio: this.state.portfolio.concat([newPortfolio])
       });
@@ -56,6 +67,7 @@ class App extends React.Component {
     //Closes and deletes portfolio
     closePortfolio(e, id){
       e.stopPropagation();
+      console.log(id)
       let portfolios = [...this.state.portfolio]
       let selected = portfolios.filter(portfolio => portfolio.id !==  id)
       this.setState({portfolio: selected});

@@ -31,35 +31,14 @@ export default class Graph extends React.Component{
       if(Object.keys(data)[0] === 'Note' || Object.keys(data)[0] === 'Error Message'){
         alert('Only 5 request are allowed in one minute (by API)')
       }else {
-        // console.log(data)
         let dataL = data['Time Series (Daily)']
-        // console.log('dataL ',dataL)
         let days = Object.keys(dataL).reverse()
-        // console.log('days ', days)
         let values = []
         values = days.map(day => values.concat(dataL[day])[0])
-        // console.log('values ',values)
         return [values, days]
       }
     })
   }
-  // //Fetches stock data for past 10 recorded dates
-  // async fetchStockData(name){
-  //   return await fetch('https://www.alphavantage.co/query?function='+name+'&symbol=USDEUR&interval=weekly&time_period=10&series_type=open&apikey=XDNRE3YNSC6MJXBQ')
-  //   .then(response => response.json())
-  //   .then(data => {
-  //     if(Object.keys(data)[0] === 'Note' || Object.keys(data)[0] === 'Error Message'){
-  //       alert('Only 5 request are allowed in one minute (by API)')
-  //     }else {
-  //       console.log(data)
-  //       let dataL = data['Technical Analysis: ' + name]
-  //       let days = Object.keys(dataL).reverse()
-  //       let values = []
-  //       values = days.map(day => values.concat(dataL[day])[0])
-  //       return [values, days]
-  //     }
-  //   })
-  // }
   addListToSelectTag(list, selectIdList) {
     for(var j = 0; j<selectIdList.length; j++){  
       let select = document.getElementById(selectIdList[j])
@@ -79,7 +58,6 @@ export default class Graph extends React.Component{
     this.fetchStockData(name))).then(result => {
       sD = [...result];
       this.setState({stockData: Object.assign([], result)});
-      console.log('sD: ',sD)
     })
   let time1 = sD[0][1][sD[0][1].length-11]
   let time2 = sD[0][1][sD[0][1].length-1]
@@ -110,14 +88,12 @@ drawGraph(time1, time2){
           dataPoints = dataPoints.concat(parseFloat(Object.values(sD[j][0][i])[0]))
         }
         if(!Array.isArray(dataPoints)){
-          // console.log(dataPoints)
           isUndefined = true
           break;
         }
         realList.push(dataPoints)
       }
     }catch{
-      console.log('error') 
     }
     if(isUndefined === false){
       this.setState({

@@ -44,6 +44,7 @@ export default class Portfolio extends React.Component{
 
     return true;
 }
+//On component mount updates totals of stocks
   componentDidMount() {
     let copyStocks = [...this.props.stocks]
     let newTotalValue = 0
@@ -60,7 +61,6 @@ export default class Portfolio extends React.Component{
   }, () => {
     this.props.updatePortfolioState(this.state.id, this.state.stocks, this.state.name)
   });
-  // this.fetchStockValue()
   }
 
   //Fetches currency rate from API on click
@@ -90,7 +90,6 @@ export default class Portfolio extends React.Component{
     e.stopPropagation();
     let el = e.target
     let input = el.parentElement.firstChild
-    console.log(el.parentElement)
     if(el.hasAttribute("hidden")){
        el.removeAttribute("hidden")
     }else{ 
@@ -153,7 +152,7 @@ export default class Portfolio extends React.Component{
   saveStock = () => {
     if(this.state.newStock.name.length>1 && this.state.newStock.quantity > 0){
       let newstock =  {...this.state.newStock}
-      let name = newstock.name
+      let name = newstock.name.toUpperCase()
       if(this.state.stocks.length>=50){
         alert('Maximum number of portfolios is 50')
       } else {
@@ -161,12 +160,12 @@ export default class Portfolio extends React.Component{
         .then(response => response.json())
         .then(data => {
           if(Object.keys(data)[0] === 'Note' || Object.keys(data)[0] === 'Error Message'){
-            console.log(Object.values(data)[0])
             alert(Object.values(data)[0])
           }else {
             let dataL = data['Time Series (Daily)']
             let day = Object.keys(dataL)[0]
             let value = Object.values(dataL[day])[0]
+            newstock.name = name
             newstock.uv = value
             newstock.tv = (newstock.uv*newstock.quantity).toFixed(2)
             newstock.checked = false
@@ -200,7 +199,6 @@ export default class Portfolio extends React.Component{
     let stocksCpy = Object.assign([], this.state.stocks);
     let stock = stocksCpy.filter(s=> s.id === id)[0]
     stock.checked ? stock.checked = false : stock.checked = true
-    console.log('stocksCopy ', stocksCpy)
     this.setState({
       stocks: stocksCpy,
   }, () => {
