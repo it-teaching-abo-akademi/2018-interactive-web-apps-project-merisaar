@@ -8,13 +8,15 @@ class App extends React.Component {
   constructor() {
     super();
     let pf = localStorage.getItem('portfolio')
-    if(pf){
-      console.log(JSON.parse(pf))
+    console.log(pf)
+    if(pf !== null){
       pf = JSON.parse(pf)
+    } else {
+      pf = []
     }
     this.state = {
       portfolio: pf, 
-      // [
+      // portfolio: [
       //     {
       //       name: 'Portfolio 1',
       //       id: 1,
@@ -96,6 +98,7 @@ class App extends React.Component {
           pfCopy[i].stocks = stocks
         }
       }
+      this.setState({portfolio: pfCopy})
       this.onSetResult(pfCopy, 'portfolio')
     }
     //Adds new empty portfolio

@@ -7,10 +7,7 @@ import Graph from './graphDraw';
 export default class Portfolio extends React.Component{
   constructor(props) {
     super(props);
-    let copyTest = [...props.stocks]
-    copyTest = copyTest.forEach(function(st){ 
-      st.tv = st.uv*st.quantity
-    })
+
     this.state = {
       stocks: this.props.stocks,
       currency: 'EUR',
@@ -34,6 +31,7 @@ export default class Portfolio extends React.Component{
     this.onOpenModal = this.onOpenModal.bind(this)
 
   }
+  //Checks if arrays are equal
   arraysEqual(arr1, arr2) {
     if(arr1.length !== arr2.length)
         return false;
@@ -44,18 +42,22 @@ export default class Portfolio extends React.Component{
 
     return true;
 }
-  //When state changes update portfolio state
-  componentDidUpdate(prevProps) {
-    console.log('props ', prevProps.stocks)
-    console.log('state ', this.state.stocks)
-    // Typical usage (don't forget to compare props):
-    let idList = this.state.stocks.map(s => s.id)
-    let idList2 = prevProps.stocks.map(s => s.id)
-    if (!this.arraysEqual(idList, idList2) || prevProps.name !== this.state.name) {
-      console.log('in if')
-      this.props.updatePortfolioState(this.state.id, this.state.stocks, this.state.name)
+  componentDidMount() {
+    console.log('component did mount')
+    let copyStocks = [...this.props.stocks]
+    console.log(copyStocks)
+    for(var i = 0; i<copyStocks.length-1; i++){
+      copyStocks[i].tv = (copyStocks[i].uv*copyStocks[i].quantity).toFixed(2)
     }
+    console.log(copyStocks)
+    this.setState({
+      stocks: copyStocks
+  }, () => {
+    this.props.updatePortfolioState(this.state.id, this.state.stocks, this.state.name)
+  });
+  // this.fetchStockValue()
   }
+
   //Fetches currency rate from API on click
   fetchCurrencyRate(e, cur1, cur2) {
     e.stopPropagation();
@@ -76,12 +78,27 @@ export default class Portfolio extends React.Component{
       }
       })
   }
+  //Fetches stock value
+  async fetchStockValue(){
+    // return await fetch('https://www.alphavantage.co/query?function='+name+'&symbol=USDEUR&interval=weekly&time_period=10&series_type=open&apikey=XDNRE3YNSC6MJXBQ')
+    fetch('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MSFT&apikey=demo')
+    .then(response => response.json())
+    .then(data => {
+      if(Object.keys(data)[0] === 'Note' || Object.keys(data)[0] === 'Error Message'){
+        alert('Only 5 request are allowed in one minute (by API)')
+      }else {
+        // let dataL = data['Technical Analysis: ' + name]
+        // let day = Object.keys(dataL)[0]
+        // let value = dataL[day]
+        console.log(data)
+      }
+    })
+  }
   //Toggles input and text
   hideTextShowInput(e){
     e.stopPropagation();
     let el = e.target
     let input = el.parentElement.firstChild
-    // let saveButton = el.parentElement.childNodes[1]
     console.log(el.parentElement)
     if(el.hasAttribute("hidden")){
        el.removeAttribute("hidden")
@@ -92,17 +109,19 @@ export default class Portfolio extends React.Component{
   //Store name while typing
   changeName(e){
     e.stopPropagation();
-    console.log(e.target.value)
     this.setState({
       newName:e.target.value,
     })
   }
-  //Saves modified name
+  //Saves modified portfolio name
   saveNameChange(e){
     e.stopPropagation();
     if(this.state.newName.trim().length>1){
       this.setState({
-        name: this.state.newName.trim()})
+        name: this.state.newName.trim()
+    }, () => {
+      this.props.updatePortfolioState(this.state.id, this.state.stocks, this.state.name)
+    });
     } else {
       alert('Name too short')
     }
@@ -135,32 +154,96 @@ export default class Portfolio extends React.Component{
     cpy[n] = e.target.value
     this.setState({
       newStock: cpy,
-    });
+  }, () => {
+    this.props.updatePortfolioState(this.state.id, this.state.stocks, this.state.name)
+  });
   }
-  //Saves stock when clicking 'save'
+  //Saves and add stock when clicking 'save'
   saveStock = () => {
-    if(this.state.newStock.name.length>1 && this.state.newStock.uv > 0 && this.state.newStock.quantity > 0){
+    if(this.state.newStock.name.length>1 && this.state.newStock.quantity > 0){
       let newstock =  {...this.state.newStock}
-      newstock.tv = newstock.uv*newstock.quantity
-      let len = this.state.stocks.length + 1
-      newstock.id = 'stock' + this.state.id + len 
-      console.log(newstock.id)
-      var newStocksList = this.state.stocks.concat(newstock)
-      this.setState({
-        stocks: newStocksList,
-        isOpen: !this.state.isOpen
-      });
-    } else {
-      alert('Invalid input')
-    }
+      let name = newstock.name
+        fetch('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol='+name+'&apikey=XDNRE3YNSC6MJXBQ')
+        // fetch('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MSFT&apikey=demo')
+       
+        .then(response => response.json())
+        .then(data => {
+          if(Object.keys(data)[0] === 'Note' || Object.keys(data)[0] === 'Error Message'){
+            console.log(Object.values(data)[0])
+            alert(Object.values(data)[0])
+          }else {
+            let dataL = data['Time Series (Daily)']
+            console.log(dataL)
+            let day = Object.keys(dataL)[0]
+            console.log(day)
+            let value = Object.values(dataL[day])[0]
+            console.log(value)
+            newstock.uv = value
+            newstock.tv = newstock.uv*newstock.quantity
+            let len = this.state.stocks.length + 1
+            newstock.id = 'stock' + this.state.id + len 
+            var newStocksList = this.state.stocks.concat(newstock)
+            this.setState({
+              stocks: newStocksList,
+              isOpen: !this.state.isOpen
+          }, () => {
+            this.props.updatePortfolioState(this.state.id, this.state.stocks, this.state.name)
+          });
+          }
+        })
+      }
+      //   fetch('https://www.alphavantage.co/query?function='+name+'&symbol=USDEUR&interval=weekly&time_period=10&series_type=open&apikey=XDNRE3YNSC6MJXBQ')
+      //   // fetch('https://www.alphavantage.co/query?function=EMA&symbol=MSFT&interval=weekly&time_period=10&series_type=open&apikey=demo')
+       
+      //   .then(response => response.json())
+      //   .then(data => {
+      //     if(Object.keys(data)[0] === 'Note' || Object.keys(data)[0] === 'Error Message'){
+      //       console.log(Object.values(data)[0])
+      //       alert(Object.values(data)[0])
+      //     }else {
+      //       let dataL = data['Technical Analysis: ' + name]
+      //       console.log(dataL)
+      //       let day = Object.keys(dataL)[0]
+      //       console.log(day)
+      //       let value = Object.values(dataL[day])[0]
+      //       console.log(value)
+      //       newstock.uv = value
+      //       newstock.tv = newstock.uv*newstock.quantity
+      //       let len = this.state.stocks.length + 1
+      //       newstock.id = 'stock' + this.state.id + len 
+      //       var newStocksList = this.state.stocks.concat(newstock)
+      //       this.setState({
+      //         stocks: newStocksList,
+      //         isOpen: !this.state.isOpen
+      //     }, () => {
+      //       this.props.updatePortfolioState(this.state.id, this.state.stocks, this.state.name)
+      //     });
+      //     }
+      //   })
+      // }
+    //   newstock.tv = newstock.uv*newstock.quantity
+    //   let len = this.state.stocks.length + 1
+    //   newstock.id = 'stock' + this.state.id + len 
+    //   var newStocksList = this.state.stocks.concat(newstock)
+    //   this.setState({
+    //     stocks: newStocksList,
+    //     isOpen: !this.state.isOpen
+    // }, () => {
+    //   this.props.updatePortfolioState(this.state.id, this.state.stocks, this.state.name)
+    // });
+    // } else {
+    //   alert('Invalid input')
+    // }
   }
   //Removes selected columns and stocks
   removeSelected (e) {
     let stocksCopy = [...this.state.stocks]
-    console.log(stocksCopy)
     let selected = stocksCopy.filter(stock => stock.checked === false)
-    console.log(selected)
-    this.setState({stocks: selected});
+    
+    this.setState({
+      stocks: selected}, () => {
+    this.props.updatePortfolioState(this.state.id, this.state.stocks, this.state.name)
+});
   }
   //Sets checked to true in state stock when clicking the checkbox
   setChecked (e, id) {
@@ -231,7 +314,6 @@ export default class Portfolio extends React.Component{
                   onClose={this.popUpModal}>
                   <form onChange={this.newStock}>
                   Name: <input id={'name-'+this.state.id} type="text"></input>
-                  Value: <input id={'uv-'+this.state.id} type="number"></input>
                   Quantity:<input id={'quantity-'+this.state.id} type="number"></input>
                   <button onClick={this.saveStock}type="button">Save</button>
                   </form>
