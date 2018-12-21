@@ -10,7 +10,7 @@ export default class Portfolio extends React.Component{
 
     this.state = {
       stocks: this.props.stocks,
-      totalValuOfStocks:this.props.totalValue,
+      totalValuOfStocks:this.props.total,
       currency: 'EUR',
       newName: '',
       name: this.props.name,
@@ -52,7 +52,7 @@ export default class Portfolio extends React.Component{
       let total = copyStocks[i].uv*copyStocks[i].quantity
       copyStocks[i].tv = total.toFixed(2)
       copyStocks[i].checked = false
-      newTotalValue += total
+      newTotalValue = total + newTotalValue
     }
     newTotalValue = newTotalValue.toFixed(2)
     this.setState({
@@ -164,17 +164,27 @@ export default class Portfolio extends React.Component{
           }else {
             let dataL = data['Time Series (Daily)']
             let day = Object.keys(dataL)[0]
-            let value = Object.values(dataL[day])[0]
+            let value = parseFloat(Object.values(dataL[day])[0])
+            console.log(value)
             newstock.name = name
-            newstock.uv = value
-            newstock.tv = (newstock.uv*newstock.quantity).toFixed(2)
+            newstock.uv = value.toFixed(2)
+            let totalv = newstock.uv*newstock.quantity
+            console.log(totalv)
+            newstock.tv = totalv.toFixed(2)
             newstock.checked = false
+            let total = {...this.state.totalValuOfStocks}
+            console.log(total)
+            total = parseFloat(total)
+            console.log(total)
+            total = totalv + total
+            console.log('total ',total)
             let len = this.state.stocks.length + 1
             newstock.id = 'stock' + this.state.id + len 
             var newStocksList = this.state.stocks.concat(newstock)
             this.setState({
               stocks: newStocksList,
-              isOpen: !this.state.isOpen
+              isOpen: !this.state.isOpen,
+              totalValuOfStocks: total
           }, () => {
             this.props.updatePortfolioState(this.state.id, this.state.stocks, this.state.name)
           });
@@ -249,7 +259,7 @@ export default class Portfolio extends React.Component{
 
         </table>
         </div>
-        <div className="btngroup">
+        <div className="btn-group">
 
         <button onClick={this.popUpModal} className="button" id="desktop" >
         Add in stock
@@ -261,8 +271,8 @@ export default class Portfolio extends React.Component{
         <button onClick={this.removeSelected} className="button" id="mobile" >
         Remove selected
         </button>
-        <div>Total stock value: {this.state.totalValuOfStocks}{this.state.currencySymbol}</div>
         </div>
+        <div>Total stock value: {this.state.totalValuOfStocks}{this.state.currencySymbol}</div>
         <PopUp show={this.state.isOpen}
                   onClose={this.popUpModal}>
                   <form onChange={this.newStock}>

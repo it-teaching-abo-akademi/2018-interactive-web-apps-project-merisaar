@@ -8,9 +8,9 @@ class App extends React.Component {
   constructor() {
     super();
     let pf = localStorage.getItem('portfolio')
+    console.log(pf)
     if(pf !== null){
-      // pf = JSON.parse(pf)
-      pf=[]
+      pf = JSON.parse(pf)
     } else {
       pf = []
     }
@@ -69,7 +69,9 @@ class App extends React.Component {
       e.stopPropagation();
       console.log(id)
       let portfolios = [...this.state.portfolio]
+      console.log(portfolios)
       let selected = portfolios.filter(portfolio => portfolio.id !==  id)
+      console.log(selected)
       this.setState({portfolio: selected});
       this.onSetResult(selected, 'portfolio')
   }
@@ -77,7 +79,7 @@ class App extends React.Component {
     render(){
       //Adds portfolios from state to the page
       const renObjData = this.state.portfolio.map( (data,index) =>
-            <Portfolio name={data.name} totalValue={0} updatePortfolioState={this.updatePortfolioState} stocks={data.stocks} closePortfolio={this.closePortfolio} key = {index} id={data.id} />
+            <Portfolio name={data.name} total={data.totalValue} updatePortfolioState={this.updatePortfolioState} stocks={data.stocks} closePortfolio={this.closePortfolio} key = {data.id} id={data.id} />
         );
     return (
       <div className="App">

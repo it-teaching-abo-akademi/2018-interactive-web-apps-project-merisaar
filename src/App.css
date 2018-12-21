@@ -96,6 +96,7 @@
     width: 100%;
     text-align: left;
     border-collapse: collapse;
+    overflow:auto;  
   }
   table.blueTable td, table.blueTable th {
     border: 1px solid #AAAAAA;
@@ -162,11 +163,14 @@
     top: 10px;
     right: 10px;
   }
-  .button {
-    background-color: grey; 
-    border: none;
-    color: white;
-    padding: 15px 32px;
+  .btngroup {
+    display: flex;
+  }
+  .btngroup .button {
+    background-color: rgb(236, 175, 150); 
+    border: 1px solid black;
+    color: black;
+    padding: 10px 20px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
@@ -175,9 +179,24 @@
     transition-duration: 0.4s;
   }
   
+  .btn-group {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+  }
+  .btn-group button {
+    background-color: rgb(236, 175, 150); /* Green background */
+    border: 1px solid black;
+    color: black; /* White text */
+    padding: 1% 2%; /* Some padding */
+    margin: 5%;
+    cursor: pointer; /* Pointer/hand icon */
+    float: left; /* Float the buttons side by side */
+
+  }
   .button:hover {
-    background-color: #4CAF50;
-    color: white;
+    background-color: gainsboro;
+    color: black;
   }
   .card {
     display: flex;
@@ -190,18 +209,7 @@
     max-width: 500px;
     float:left;
   }
-  .btn-group button {
-    background-color: rgb(247, 164, 88); /* Green background */
-    border: 1px solid black; /* Green border */
-    color: black; /* White text */
-    padding: 1% 2%; /* Some padding */
-    cursor: pointer; /* Pointer/hand icon */
-    float: left; /* Float the buttons side by side */
-  }
   
-  .btn-group button:not(:last-child) {
-    border-right: none; /* Prevent double borders */
-  }
   
   /* Clear floats (clearfix hack) */
   .btn-group:after {
