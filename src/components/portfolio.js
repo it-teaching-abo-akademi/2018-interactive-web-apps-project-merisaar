@@ -20,6 +20,7 @@ export default class Portfolio extends React.Component{
       newStock: {name : '', uv : 0, quantity : 0, tv:0},
       chartData: [],
       stockData: [],
+      currencySymbol: '€',
     };
     this.fetchCurrencyRate = this.fetchCurrencyRate.bind(this)
     this.changeName =this.changeName.bind(this)
@@ -63,7 +64,7 @@ export default class Portfolio extends React.Component{
   }
 
   //Fetches currency rate from API on click
-  fetchCurrencyRate(e, cur1, cur2) {
+  fetchCurrencyRate(e, cur1, cur2, curSymb) {
     e.stopPropagation();
     fetch('https://free.currencyconverterapi.com/api/v6/convert?q=' + cur1 + '_' + cur2)
       .then(response => response.json())
@@ -78,6 +79,7 @@ export default class Portfolio extends React.Component{
           this.setState({
             stocks: stocksC,
             currency: cur2,
+            currencySymbol: curSymb,
           });
       }
       })
@@ -215,7 +217,7 @@ export default class Portfolio extends React.Component{
 
   render() {
     const renObjData = this.state.stocks.map((data, index) =>
-          <Stock stock ={data} key={index} setChecked={this.setChecked}/>
+          <Stock stock ={data} key={index} setChecked={this.setChecked} currencySymbol={this.state.currencySymbol}/>
     );
     const openModal = (this.state.open === true) ?
       <Graph stocks={this.state.stocks} onCloseModal={this.onCloseModal} open={this.state.open}></Graph> : ''
@@ -227,10 +229,10 @@ export default class Portfolio extends React.Component{
       <button onClick={(e) => {this.props.closePortfolio(e, this.state.id)}} className = 'close' ></button>
       <div><div hidden><input onChange={this.changeName} id={this.props.name}></input><button onClick={this.saveNameChange}>Save</button><button onClick={this.cancelNameChange}>Cancel</button></div><p onClick={this.hideTextShowInput}>{this.state.name}</p></div>
        <div className="btngroup">
-            <button onClick={(e) => {this.fetchCurrencyRate(e, 'USD', 'EUR')}} className="button" id="desktop" >
+            <button onClick={(e) => {this.fetchCurrencyRate(e, 'USD', 'EUR', '€')}} className="button" id="desktop" >
             Show in €
           </button>
-            <button onClick={(e) => {this.fetchCurrencyRate(e, 'EUR', 'USD')}} className="button" id="mobile" >
+            <button onClick={(e) => {this.fetchCurrencyRate(e, 'EUR', 'USD', '$')}} className="button" id="mobile" >
             show in $
           </button>
 
@@ -257,7 +259,7 @@ export default class Portfolio extends React.Component{
         <button onClick={this.removeSelected} className="button" id="mobile" >
         Remove selected
         </button>
-        <div>Total stock value: {this.state.totalValuOfStocks}</div>
+        <div>Total stock value: {this.state.totalValuOfStocks}{this.state.currencySymbol}</div>
         </div>
         <PopUp show={this.state.isOpen}
                   onClose={this.popUpModal}>
