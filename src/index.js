@@ -7,72 +7,96 @@ import Portfolio from './components/portfolio.js'
 class App extends React.Component {
   constructor() {
     super();
+    let pf = localStorage.getItem('portfolio')
+    if(pf){
+      console.log(JSON.parse(pf))
+      pf = JSON.parse(pf)
+    }
     this.state = {
-      portfolio: [
-          {
-            name: 'Portfolio 1',
-            id: 1,
-            stocks: [
-              {
-                id: 'stock11',
-                name: 'ADX',
-                uv: 4.3,
-                quantity:10,
-                tv: 0,
-                checked: false,
-              },
-              {
-                id: 'stock12',
-                name: 'SMA',
-                uv: 2.64,
-                quantity:4,
-                tv: 0,
-                checked: false,
-              },
-              {
-                id: 'stock13',
-                name: 'EMA',
-                uv: 40.32,
-                quantity:1,
-                tv: 0,
-                checked: false,
-              }
-            ]
-          },
-          {
-            name: 'Portfolio 2',
-            id: 2,
-            stocks: [
-              {
-                id: 'stock21',
-                name: 'DEMA',
-                uv: 4.3,
-                quantity:10,
-                tv: 0,
-                checked: false,
-              },
-              {
-                id: 'stock22',
-                name: 'MOM',
-                uv: 2.64,
-                quantity:4,
-                tv: 0,
-                checked: false,
-              },
-              {
-                id: 'stock23',
-                name: 'PPO',
-                uv: 40.32,
-                quantity:1,
-                tv: 0,
-                checked: false,
-              }
-            ]
-          }
-        ]
+      portfolio: pf, 
+      // [
+      //     {
+      //       name: 'Portfolio 1',
+      //       id: 1,
+      //       stocks: [
+      //         {
+      //           id: 'stock11',
+      //           name: 'ADX',
+      //           uv: 4.3,
+      //           quantity:10,
+      //           tv: 0,
+      //           checked: false,
+      //         },
+      //         {
+      //           id: 'stock12',
+      //           name: 'SMA',
+      //           uv: 2.64,
+      //           quantity:4,
+      //           tv: 0,
+      //           checked: false,
+      //         },
+      //         {
+      //           id: 'stock13',
+      //           name: 'EMA',
+      //           uv: 40.32,
+      //           quantity:1,
+      //           tv: 0,
+      //           checked: false,
+      //         }
+      //       ]
+      //     },
+      //     {
+      //       name: 'Portfolio 2',
+      //       id: 2,
+      //       stocks: [
+      //         {
+      //           id: 'stock21',
+      //           name: 'DEMA',
+      //           uv: 4.3,
+      //           quantity:10,
+      //           tv: 0,
+      //           checked: false,
+      //         },
+      //         {
+      //           id: 'stock22',
+      //           name: 'MOM',
+      //           uv: 2.64,
+      //           quantity:4,
+      //           tv: 0,
+      //           checked: false,
+      //         },
+      //         {
+      //           id: 'stock23',
+      //           name: 'PPO',
+      //           uv: 40.32,
+      //           quantity:1,
+      //           tv: 0,
+      //           checked: false,
+      //         }
+      //       ]
+      //     }
+      //   ]
       }
       this.addNewPortfolio = this.addNewPortfolio.bind(this);
       this.closePortfolio = this.closePortfolio.bind(this)
+      this.updatePortfolioState = this.updatePortfolioState.bind(this)
+    }
+
+    //Set result to state and localStorage
+    onSetResult = (result, key) => {
+      localStorage.setItem(key, JSON.stringify(result));
+      this.setState({ portfolio: result });
+    }
+    //Updates portfolio when stock updates
+    updatePortfolioState(portfolioId, stocks, name){
+      let pfCopy =  Object.assign([],  this.state.portfolio);
+      for(var i = 0; i<pfCopy.length-1; i++){
+        if(pfCopy[i].id === portfolioId){
+          pfCopy[i].name = name
+          pfCopy[i].stocks = stocks
+        }
+      }
+      this.onSetResult(pfCopy, 'portfolio')
     }
     //Adds new empty portfolio
     addNewPortfolio (e) {
@@ -83,6 +107,7 @@ class App extends React.Component {
       this.setState({
         portfolio: this.state.portfolio.concat([newPortfolio])
       });
+      this.onSetResult(this.state.portfolio.concat([newPortfolio]), 'portfolio')
     } else { 
       alert('Too many portfolios. Max amount of portfolios is 10.')
     }
@@ -93,12 +118,13 @@ class App extends React.Component {
       let portfolios = [...this.state.portfolio]
       let selected = portfolios.filter(portfolio => portfolio.id !==  id)
       this.setState({portfolio: selected});
+      this.onSetResult(selected, 'portfolio')
   }
 
     render(){
       //Adds portfolios from state to the page
       const renObjData = this.state.portfolio.map( data =>
-            <Portfolio name={data.name} stocks={data.stocks} closePortfolio={this.closePortfolio} key = {data.id} id={data.id} />
+            <Portfolio name={data.name} updatePortfolioState={this.updatePortfolioState} stocks={data.stocks} closePortfolio={this.closePortfolio} key = {data.id} id={data.id} />
         );
     return (
       <div className="App">

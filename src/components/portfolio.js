@@ -2,9 +2,6 @@ import React from 'react'
 import Stock from './stockData.js'
 import '../App.css';
 import PopUp from './Popup';
-// import drawGraph from './graphDraw';
-
-
 import Graph from './graphDraw';
 
 export default class Portfolio extends React.Component{
@@ -35,8 +32,30 @@ export default class Portfolio extends React.Component{
     this.removeSelected = this.removeSelected.bind(this)
     this.setChecked = this.setChecked.bind(this)
     this.onOpenModal = this.onOpenModal.bind(this)
-  }
 
+  }
+  arraysEqual(arr1, arr2) {
+    if(arr1.length !== arr2.length)
+        return false;
+    for(var i = arr1.length; i--;) {
+        if(arr1[i] !== arr2[i])
+            return false;
+    }
+
+    return true;
+}
+  //When state changes update portfolio state
+  componentDidUpdate(prevProps) {
+    console.log('props ', prevProps.stocks)
+    console.log('state ', this.state.stocks)
+    // Typical usage (don't forget to compare props):
+    let idList = this.state.stocks.map(s => s.id)
+    let idList2 = prevProps.stocks.map(s => s.id)
+    if (!this.arraysEqual(idList, idList2) || prevProps.name !== this.state.name) {
+      console.log('in if')
+      this.props.updatePortfolioState(this.state.id, this.state.stocks, this.state.name)
+    }
+  }
   //Fetches currency rate from API on click
   fetchCurrencyRate(e, cur1, cur2) {
     e.stopPropagation();
@@ -56,10 +75,6 @@ export default class Portfolio extends React.Component{
           });
       }
       })
-  }
-  //Adds new empty stock
-  addNewStock (e) {
-    e.stopPropagation();
   }
   //Toggles input and text
   hideTextShowInput(e){
@@ -97,6 +112,7 @@ export default class Portfolio extends React.Component{
     text.removeAttribute("hidden")
   }
   
+  //Cancels name change
   cancelNameChange(e){
     let div = e.target.parentElement
     let text = div.nextSibling
@@ -155,38 +171,15 @@ export default class Portfolio extends React.Component{
     this.setState({stocks: stocksCpy});
 
   }
-  //Fetches stock data for past 10 recorded dates
-  async fetchStockData(name){
-    return await fetch('https://www.alphavantage.co/query?function='+name+'&symbol=USDEUR&interval=weekly&time_period=10&series_type=open&apikey=XDNRE3YNSC6MJXBQ')
-    .then(response => response.json())
-    .then(data => {
-      if(Object.keys(data)[0] === 'Note' || Object.keys(data)[0] === 'Error Message'){
-        alert('Only 5 request are allowed in one minute (by API)')
-      }else {
-        console.log(data)
-        let dataL = data['Technical Analysis: ' + name]
-        let days = Object.keys(dataL).reverse()
-        let values = []
-        values = days.map(day => values.concat(dataL[day])[0])
-        return [values, days]
-      }
-    })
-  }
- 
-  addListToSelectTag(list, selectIdList) {
-    for(var j = 0; j<selectIdList.length; j++){  
-      let select = document.getElementById(selectIdList[j])
-      for(var i = 0; i<list.length; i++){
-        var option = document.createElement("option")
-        option.text = list[i]
-        select.add(option)
-        }
-      }
-  }
+
   //Opens modal and draws graph
   onOpenModal = (e) => {
     e.stopPropagation();
     this.setState({ open: true });
+  };
+  //Closes modal
+  onCloseModal = () => {
+    this.setState({ open: false });
   };
 
   render() {
@@ -194,8 +187,7 @@ export default class Portfolio extends React.Component{
           <Stock stock ={data} key={index} setChecked={this.setChecked}/>
     );
     const openModal = (this.state.open === true) ?
-      <Graph stocks={this.state.stocks} open={this.state.open}></Graph>
-      : console.log('not open')
+      <Graph stocks={this.state.stocks} onCloseModal={this.onCloseModal} open={this.state.open}></Graph> : ''
     
 
     return (

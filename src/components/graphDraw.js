@@ -16,16 +16,11 @@ export default class Graph extends React.Component{
     // this.onOpenModal = this.onOpenModal.bind(this)
     this.drawStockValueCurves()
   }
-  // //Opens modal and draws graph
-  // onOpenModal = (e) => {
-  //   e.stopPropagation();
-  //   this.setState({ open: true });
-  //   this.drawStockValueCurves(e)
-  // };
 
   //Closes modal
-  onCloseModal = () => {
+  closeModal = () => {
     this.setState({ open: false });
+    this.props.onCloseModal()
   };
   //Fetches stock data for past 10 recorded dates
   async fetchStockData(name){
@@ -85,7 +80,7 @@ drawGraph(time1, time2){
     let isUndefined = false
     let realList = []
     realList.push(list)
-    // try{
+    try{
       for(var i = idx1; i<idx2+1; i++){
         let dataPoints = []
         dataPoints = [sD[0][1][i]]
@@ -100,9 +95,9 @@ drawGraph(time1, time2){
         realList.push(dataPoints)
         console.log(realList)
       }
-    // }catch{
-    //   console.log('error') 
-    // }
+    }catch{
+      console.log('error') 
+    }
     if(isUndefined === false){
       console.log(realList)
       this.setState({
@@ -123,7 +118,7 @@ render() {
   return(
     <Modal 
         open={this.state.open} 
-        onClose={this.onCloseModal} 
+        onClose={this.closeModal} 
         center
         classNames={{
           overlay: styles.customOverlay,
