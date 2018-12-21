@@ -3,9 +3,9 @@ import Stock from './stockData.js'
 import '../App.css';
 import PopUp from './Popup';
 // import drawGraph from './graphDraw';
-import Chart from "react-google-charts";
-import Modal from 'react-responsive-modal';
-import styles from '../custom-styling.css';
+
+
+import Graph from './graphDraw';
 
 export default class Portfolio extends React.Component{
   constructor(props) {
@@ -21,7 +21,7 @@ export default class Portfolio extends React.Component{
       name: this.props.name,
       id: this.props.id,
       isOpen: false,
-      open: false,
+      open:false,
       newStock: {name : '', uv : 0, quantity : 0, tv:0},
       chartData: [],
       stockData: [],
@@ -34,7 +34,6 @@ export default class Portfolio extends React.Component{
     this.newStock = this.newStock.bind(this)
     this.removeSelected = this.removeSelected.bind(this)
     this.setChecked = this.setChecked.bind(this)
-    this.drawCurveTypes = this.drawCurveTypes.bind(this)
     this.onOpenModal = this.onOpenModal.bind(this)
   }
 
@@ -111,17 +110,6 @@ export default class Portfolio extends React.Component{
       isOpen: !this.state.isOpen
     });
   }
-  //Opens modal and draws graph
-  onOpenModal = (e) => {
-    e.stopPropagation();
-    this.setState({ open: true });
-    this.drawCurveTypes(e)
-  };
-
-  //Closes modal
-  onCloseModal = () => {
-    this.setState({ open: false });
-  };
 
   //Restores new stock to state on change
   newStock(e) {
@@ -184,97 +172,7 @@ export default class Portfolio extends React.Component{
       }
     })
   }
-  // //Fetches stock data for past 10 recorded dates
-  // async fetchStockDataValue(name){
-  //   return await fetch('https://www.alphavantage.co/query?function='+name+'&symbol=USDEUR&interval=weekly&time_period=10&series_type=open&apikey=XDNRE3YNSC6MJXBQ')
-  //   .then(response => response.json())
-  //   .then(data => {
-  //     if(Object.keys(data)[0] === 'Note' || Object.keys(data)[0] === 'Error Message'){
-  //       alert('Only 5 request are allowed in one minute (by API)')
-  //     }else {
-  //       console.log(data)
-  //       let dataL = data['Technical Analysis: ' + name]
-  //       let days = Object.keys(dataL)
-  //       days = days.reverse()
-  //       console.log(days)
-  //       let test = []
-  //       test = days.map(day => test.concat(dataL[day])[0])
-  //       return [test, days]
-  //     }
-  //   })
-  // }
-  async drawCurveTypes(e) {
-    let stocks = this.state.stocks
-    let nameList = stocks.map(l => l.name)
-    let sD = []
-
-    await Promise.all(nameList.map(async (name) => 
-      this.fetchStockData(name))).then(result => {
-        sD = [...result];
-        this.setState({stockData: Object.assign([], result)});
-      })
-
-    let time1 = sD[0][1][sD[0][1].length-11]
-    let time2 = sD[0][1][sD[0][1].length-1]
-    console.log(time1, ' ',time2)
-    this.addListToSelectTag(sD[0][1], ['time1', 'time2'])
-    console.log(sD)
-
-    this.drawGraph(e, time1, time2)
-  }
-
-  drawGraph(e, time1, time2){
-    e.stopPropagation()
-    // let sD = [...this.state.stockData]
-    let sD = Object.assign([], this.state.stockData)
-    console.log('SD ',sD)
-    console.log(time1,time2)
-    let idx1 = sD[0][1].indexOf(time1)
-    let idx2 = sD[0][1].indexOf(time2)
-    console.log(idx1, idx2)
-    if(!(idx1 <= idx2)){
-      alert('Time invalid')
-    } else {
-      // console.log(sD)
-      let stocks = [...this.state.stocks]
-      let list = ['Time']
-      let namelist = stocks.map(l => l.name)
-      list =list.concat(namelist)
-
-      let isUndefined = false
-      let realList = []
-      realList.push(list)
-
-
-      // let timeList = 
-      try{
-        for(var i = idx1; i<idx2; i++){
-          let dataPoints = []
-          dataPoints = [sD[0][1][i]]
-          for(var j = 0; j<sD.length; j++){
-            dataPoints = dataPoints.concat(parseFloat(Object.values(sD[j][0][i])[0]))
-          }
-          if(!Array.isArray(dataPoints)){
-            // console.log(dataPoints)
-            isUndefined = true
-            break;
-          }
-          realList.push(dataPoints)
-          console.log(realList)
-        }
-      }catch{
-        console.log('error') 
-      }
-      if(isUndefined === false){
-        console.log(realList)
-        this.setState({
-          chartData: realList,
-        });
-      } else {
-        alert('Only 5 request are allowed in one minute (by API)')
-      }
-      }
-  }
+ 
   addListToSelectTag(list, selectIdList) {
     for(var j = 0; j<selectIdList.length; j++){  
       let select = document.getElementById(selectIdList[j])
@@ -285,16 +183,20 @@ export default class Portfolio extends React.Component{
         }
       }
   }
+  //Opens modal and draws graph
+  onOpenModal = (e) => {
+    e.stopPropagation();
+    this.setState({ open: true });
+  };
 
   render() {
-    const options = {
-      title: "Stock value",
-      curveType: "function",
-      legend: { position: "bottom" }
-    };
     const renObjData = this.state.stocks.map((data, index) =>
           <Stock stock ={data} key={index} setChecked={this.setChecked}/>
     );
+    const openModal = (this.state.open === true) ?
+      <Graph stocks={this.state.stocks} open={this.state.open}></Graph>
+      : console.log('not open')
+    
 
     return (
       <div className="card">
@@ -327,12 +229,11 @@ export default class Portfolio extends React.Component{
         </button>
 
         <button onClick={this.onOpenModal} className="button" id="mobile" >
-        Perf graph
+        Perf graph         
         </button>
         <button onClick={this.removeSelected} className="button" id="mobile" >
         Remove selected
         </button>
-
         </div>
         <PopUp show={this.state.isOpen}
                   onClose={this.popUpModal}>
@@ -343,28 +244,7 @@ export default class Portfolio extends React.Component{
                   <button onClick={this.saveStock}type="button">Save</button>
                   </form>
                 </PopUp>
-        <Modal 
-        open={this.state.open} 
-        onClose={this.onCloseModal} 
-        center
-        classNames={{
-          overlay: styles.customOverlay,
-          modal: styles.customModal,
-        }}
-        >
-        <h2>Graph</h2>
-        Search by time
-        <select id='time1'><option>Select starting time</option></select>
-        <select id='time2'><option>Select ending time</option></select>        
-        <button onClick={(e) => {this.drawGraph(e, document.getElementById('time1').value, document.getElementById('time2').value)}}>Search</button>
-        <Chart
-          chartType="LineChart"
-          width="700px"
-          height="400px"
-          data={this.state.chartData}
-          options={options}
-        />
-        </Modal>
+                {openModal}
                 </div>
             
               
