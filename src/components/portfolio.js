@@ -10,6 +10,7 @@ export default class Portfolio extends React.Component{
 
     this.state = {
       stocks: this.props.stocks,
+      totalValuOfStocks:this.props.totalValue,
       currency: 'EUR',
       newName: '',
       name: this.props.name,
@@ -43,15 +44,18 @@ export default class Portfolio extends React.Component{
     return true;
 }
   componentDidMount() {
-    console.log('component did mount')
     let copyStocks = [...this.props.stocks]
-    console.log(copyStocks)
-    for(var i = 0; i<copyStocks.length-1; i++){
-      copyStocks[i].tv = (copyStocks[i].uv*copyStocks[i].quantity).toFixed(2)
+    let newTotalValue = 0
+    for(var i = 0; i<copyStocks.length; i++){
+      let total = copyStocks[i].uv*copyStocks[i].quantity
+      copyStocks[i].tv = total.toFixed(2)
+      copyStocks[i].checked = false
+      newTotalValue += total
     }
-    console.log(copyStocks)
+    newTotalValue = newTotalValue.toFixed(2)
     this.setState({
-      stocks: copyStocks
+      stocks: copyStocks,
+      totalValuOfStocks: newTotalValue
   }, () => {
     this.props.updatePortfolioState(this.state.id, this.state.stocks, this.state.name)
   });
@@ -78,22 +82,7 @@ export default class Portfolio extends React.Component{
       }
       })
   }
-  //Fetches stock value
-  async fetchStockValue(){
-    // return await fetch('https://www.alphavantage.co/query?function='+name+'&symbol=USDEUR&interval=weekly&time_period=10&series_type=open&apikey=XDNRE3YNSC6MJXBQ')
-    fetch('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MSFT&apikey=demo')
-    .then(response => response.json())
-    .then(data => {
-      if(Object.keys(data)[0] === 'Note' || Object.keys(data)[0] === 'Error Message'){
-        alert('Only 5 request are allowed in one minute (by API)')
-      }else {
-        // let dataL = data['Technical Analysis: ' + name]
-        // let day = Object.keys(dataL)[0]
-        // let value = dataL[day]
-        console.log(data)
-      }
-    })
-  }
+
   //Toggles input and text
   hideTextShowInput(e){
     e.stopPropagation();
@@ -164,8 +153,6 @@ export default class Portfolio extends React.Component{
       let newstock =  {...this.state.newStock}
       let name = newstock.name
         fetch('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol='+name+'&apikey=XDNRE3YNSC6MJXBQ')
-        // fetch('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MSFT&apikey=demo')
-       
         .then(response => response.json())
         .then(data => {
           if(Object.keys(data)[0] === 'Note' || Object.keys(data)[0] === 'Error Message'){
@@ -173,13 +160,11 @@ export default class Portfolio extends React.Component{
             alert(Object.values(data)[0])
           }else {
             let dataL = data['Time Series (Daily)']
-            console.log(dataL)
             let day = Object.keys(dataL)[0]
-            console.log(day)
             let value = Object.values(dataL[day])[0]
-            console.log(value)
             newstock.uv = value
-            newstock.tv = newstock.uv*newstock.quantity
+            newstock.tv = (newstock.uv*newstock.quantity).toFixed(2)
+            newstock.checked = false
             let len = this.state.stocks.length + 1
             newstock.id = 'stock' + this.state.id + len 
             var newStocksList = this.state.stocks.concat(newstock)
@@ -192,48 +177,6 @@ export default class Portfolio extends React.Component{
           }
         })
       }
-      //   fetch('https://www.alphavantage.co/query?function='+name+'&symbol=USDEUR&interval=weekly&time_period=10&series_type=open&apikey=XDNRE3YNSC6MJXBQ')
-      //   // fetch('https://www.alphavantage.co/query?function=EMA&symbol=MSFT&interval=weekly&time_period=10&series_type=open&apikey=demo')
-       
-      //   .then(response => response.json())
-      //   .then(data => {
-      //     if(Object.keys(data)[0] === 'Note' || Object.keys(data)[0] === 'Error Message'){
-      //       console.log(Object.values(data)[0])
-      //       alert(Object.values(data)[0])
-      //     }else {
-      //       let dataL = data['Technical Analysis: ' + name]
-      //       console.log(dataL)
-      //       let day = Object.keys(dataL)[0]
-      //       console.log(day)
-      //       let value = Object.values(dataL[day])[0]
-      //       console.log(value)
-      //       newstock.uv = value
-      //       newstock.tv = newstock.uv*newstock.quantity
-      //       let len = this.state.stocks.length + 1
-      //       newstock.id = 'stock' + this.state.id + len 
-      //       var newStocksList = this.state.stocks.concat(newstock)
-      //       this.setState({
-      //         stocks: newStocksList,
-      //         isOpen: !this.state.isOpen
-      //     }, () => {
-      //       this.props.updatePortfolioState(this.state.id, this.state.stocks, this.state.name)
-      //     });
-      //     }
-      //   })
-      // }
-    //   newstock.tv = newstock.uv*newstock.quantity
-    //   let len = this.state.stocks.length + 1
-    //   newstock.id = 'stock' + this.state.id + len 
-    //   var newStocksList = this.state.stocks.concat(newstock)
-    //   this.setState({
-    //     stocks: newStocksList,
-    //     isOpen: !this.state.isOpen
-    // }, () => {
-    //   this.props.updatePortfolioState(this.state.id, this.state.stocks, this.state.name)
-    // });
-    // } else {
-    //   alert('Invalid input')
-    // }
   }
   //Removes selected columns and stocks
   removeSelected (e) {
@@ -251,7 +194,12 @@ export default class Portfolio extends React.Component{
     let stocksCpy = Object.assign([], this.state.stocks);
     let stock = stocksCpy.filter(s=> s.id === id)[0]
     stock.checked ? stock.checked = false : stock.checked = true
-    this.setState({stocks: stocksCpy});
+    console.log('stocksCopy ', stocksCpy)
+    this.setState({
+      stocks: stocksCpy,
+  }, () => {
+    this.props.updatePortfolioState(this.state.id, this.state.stocks, this.state.name)
+  });
 
   }
 
@@ -309,6 +257,7 @@ export default class Portfolio extends React.Component{
         <button onClick={this.removeSelected} className="button" id="mobile" >
         Remove selected
         </button>
+        <div>Total stock value: {this.state.totalValuOfStocks}</div>
         </div>
         <PopUp show={this.state.isOpen}
                   onClose={this.popUpModal}>

@@ -92,7 +92,7 @@ class App extends React.Component {
     //Updates portfolio when stock updates
     updatePortfolioState(portfolioId, stocks, name){
       let pfCopy =  Object.assign([],  this.state.portfolio);
-      for(var i = 0; i<pfCopy.length-1; i++){
+      for(var i = 0; i<pfCopy.length; i++){
         if(pfCopy[i].id === portfolioId){
           pfCopy[i].name = name
           pfCopy[i].stocks = stocks
@@ -127,7 +127,7 @@ class App extends React.Component {
     render(){
       //Adds portfolios from state to the page
       const renObjData = this.state.portfolio.map( data =>
-            <Portfolio name={data.name} updatePortfolioState={this.updatePortfolioState} stocks={data.stocks} closePortfolio={this.closePortfolio} key = {data.id} id={data.id} />
+            <Portfolio name={data.name} totalValue={0} updatePortfolioState={this.updatePortfolioState} stocks={data.stocks} closePortfolio={this.closePortfolio} key = {data.id} id={data.id} />
         );
     return (
       <div className="App">
