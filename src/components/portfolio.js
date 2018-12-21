@@ -106,7 +106,7 @@ export default class Portfolio extends React.Component{
   //Saves modified portfolio name
   saveNameChange(e){
     e.stopPropagation();
-    if(this.state.newName.trim().length>1){
+    if(this.state.newName.trim().length>0){
       this.setState({
         name: this.state.newName.trim()
     }, () => {
@@ -148,48 +148,67 @@ export default class Portfolio extends React.Component{
     this.props.updatePortfolioState(this.state.id, this.state.stocks, this.state.name)
   });
   }
+  //Count total value of stocks
+  countTotal=()=>{
+    let stocks = [...this.state.stocks]
+    console.log(stocks)
+    let total = 0 
+    for(var i = 0; i<stocks.length; i++){
+      console.log(parseFloat(stocks[i].tv))
+      total = parseFloat(stocks[i].tv) + total
+    }
+    console.log(total)
+    this.setState({
+      totalValuOfStocks: total
+    })
+  }
   //Saves and add stock when clicking 'save'
   saveStock = () => {
     if(this.state.newStock.name.length>1 && this.state.newStock.quantity > 0){
       let newstock =  {...this.state.newStock}
+      console.log(newstock)
       let name = newstock.name.toUpperCase()
-      if(this.state.stocks.length>=50){
-        alert('Maximum number of portfolios is 50')
-      } else {
-        fetch('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol='+name+'&apikey=XDNRE3YNSC6MJXBQ')
-        .then(response => response.json())
-        .then(data => {
-          if(Object.keys(data)[0] === 'Note' || Object.keys(data)[0] === 'Error Message'){
-            alert(Object.values(data)[0])
-          }else {
-            let dataL = data['Time Series (Daily)']
-            let day = Object.keys(dataL)[0]
-            let value = parseFloat(Object.values(dataL[day])[0])
-            console.log(value)
-            newstock.name = name
-            newstock.uv = value.toFixed(2)
-            let totalv = newstock.uv*newstock.quantity
-            console.log(totalv)
-            newstock.tv = totalv.toFixed(2)
-            newstock.checked = false
-            let total = {...this.state.totalValuOfStocks}
-            console.log(total)
-            total = parseFloat(total)
-            console.log(total)
-            total = totalv + total
-            console.log('total ',total)
-            let len = this.state.stocks.length + 1
-            newstock.id = 'stock' + this.state.id + len 
-            var newStocksList = this.state.stocks.concat(newstock)
-            this.setState({
-              stocks: newStocksList,
-              isOpen: !this.state.isOpen,
-              totalValuOfStocks: total
-          }, () => {
-            this.props.updatePortfolioState(this.state.id, this.state.stocks, this.state.name)
-          });
-          }
-        })
+      console.log(newstock.quantity)
+      if(name.trim().length<=0){
+        alert('Name is too short')
+      } else if(newstock.quantity % 1 !== 0){
+        alert("Quantity has to be a whole number")
+      }else {
+        if(this.state.stocks.length>=50){
+          alert('Maximum number of portfolios is 50')
+        } else {
+          fetch('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol='+name+'&apikey=XDNRE3YNSC6MJXBQ')
+          .then(response => response.json())
+          .then(data => {
+            if(Object.keys(data)[0] === 'Note' || Object.keys(data)[0] === 'Error Message'){
+              alert(Object.values(data)[0])
+            }else {
+              let dataL = data['Time Series (Daily)']
+              let day = Object.keys(dataL)[0]
+              let value = parseFloat(Object.values(dataL[day])[0])
+              newstock.name = name
+              newstock.uv = value.toFixed(2)
+              let totalv = newstock.uv*newstock.quantity
+              newstock.tv = totalv.toFixed(2)
+              newstock.checked = false
+              let total = parseFloat(this.state.totalValuOfStocks)
+              total = parseFloat(total)
+              total = totalv + total
+              console.log('total ',total)
+              let len = this.state.stocks.length + 1
+              newstock.id = 'stock' + this.state.id + len 
+              var newStocksList = this.state.stocks.concat(newstock)
+              this.setState({
+                stocks: newStocksList,
+                isOpen: !this.state.isOpen,
+                totalValuOfStocks: total,
+            }, () => {
+              this.props.updatePortfolioState(this.state.id, this.state.stocks, this.state.name);
+              this.countTotal()
+            });
+            }
+          })
+        }
       }
     }
   }
@@ -201,7 +220,8 @@ export default class Portfolio extends React.Component{
     this.setState({
       stocks: selected}, () => {
     this.props.updatePortfolioState(this.state.id, this.state.stocks, this.state.name)
-});
+    this.countTotal()
+  });
   }
   //Sets checked to true in state stock when clicking the checkbox
   setChecked (e, id) {
@@ -212,7 +232,7 @@ export default class Portfolio extends React.Component{
     this.setState({
       stocks: stocksCpy,
   }, () => {
-    this.props.updatePortfolioState(this.state.id, this.state.stocks, this.state.name)
+    this.props.updatePortfolioState(this.state.id, this.state.stocks, this.state.name);
   });
 
   }
