@@ -8,7 +8,6 @@ class App extends React.Component {
   constructor() {
     super();
     let pf = localStorage.getItem('portfolio')
-    console.log(pf)
     if(pf !== null){
       pf = JSON.parse(pf)
     } else {
@@ -67,11 +66,8 @@ class App extends React.Component {
     //Closes and deletes portfolio
     closePortfolio(e, id){
       e.stopPropagation();
-      console.log(id)
       let portfolios = [...this.state.portfolio]
-      console.log(portfolios)
       let selected = portfolios.filter(portfolio => portfolio.id !==  id)
-      console.log(selected)
       this.setState({portfolio: selected});
       this.onSetResult(selected, 'portfolio')
   }

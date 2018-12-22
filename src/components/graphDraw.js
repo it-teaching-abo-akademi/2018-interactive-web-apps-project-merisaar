@@ -59,14 +59,15 @@ export default class Graph extends React.Component{
       sD = [...result];
       this.setState({stockData: Object.assign([], result)});
     })
+  if(sD.length !== 0){
   let time1 = sD[0][1][sD[0][1].length-11]
   let time2 = sD[0][1][sD[0][1].length-1]
   this.addListToSelectTag(sD[0][1], ['time1', 'time2'])
   this.drawGraph(time1, time2)
+  }
 }
 
 drawGraph(time1, time2){
-  // e.stopPropagation()
   let sD = Object.assign([], this.state.stockData)
   let idx1 = sD[0][1].indexOf(time1)
   let idx2 = sD[0][1].indexOf(time2)

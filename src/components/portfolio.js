@@ -80,7 +80,10 @@ export default class Portfolio extends React.Component{
             stocks: stocksC,
             currency: cur2,
             currencySymbol: curSymb,
-          });
+        }, () => {
+          // this.props.updatePortfolioState(this.state.id, this.state.stocks, this.state.name)
+          this.countTotal()
+        });
       }
       })
   }
