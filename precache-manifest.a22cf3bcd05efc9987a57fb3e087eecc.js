@@ -4,23 +4,23 @@ self.__precacheManifest = [
     "url": "/2018-interactive-web-apps-project-merisaar/static/js/runtime~main.bf5d1957.js"
   },
   {
-    "revision": "d3ce51171ea433ddf897",
-    "url": "/2018-interactive-web-apps-project-merisaar/static/js/main.d3ce5117.chunk.js"
+    "revision": "795e487c3f0d7f92aed4",
+    "url": "/2018-interactive-web-apps-project-merisaar/static/js/main.795e487c.chunk.js"
   },
   {
     "revision": "eda8a590dfe4594292f6",
     "url": "/2018-interactive-web-apps-project-merisaar/static/js/1.eda8a590.chunk.js"
   },
   {
-    "revision": "d3ce51171ea433ddf897",
-    "url": "/2018-interactive-web-apps-project-merisaar/static/css/main.b501001f.chunk.css"
+    "revision": "795e487c3f0d7f92aed4",
+    "url": "/2018-interactive-web-apps-project-merisaar/static/css/main.a0ac6e1f.chunk.css"
   },
   {
     "revision": "eda8a590dfe4594292f6",
     "url": "/2018-interactive-web-apps-project-merisaar/static/css/1.78373d4d.chunk.css"
   },
   {
-    "revision": "c6d9a7f9eb9737d1f150635d731daefb",
+    "revision": "a3e53d8728ea80c9760bc05b27737676",
     "url": "/2018-interactive-web-apps-project-merisaar/index.html"
   }
 ];
