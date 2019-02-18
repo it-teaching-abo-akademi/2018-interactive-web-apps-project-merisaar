@@ -1,3 +1,9 @@
+GitHub page: https://it-teaching-abo-akademi.github.io/2018-interactive-web-apps-projectmerisaar/
+Comments:
+⦁ Name changing can be accessed by clicking the portfolio name.
+⦁ Because API allows shorter stock words (like A), they are allowed
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
